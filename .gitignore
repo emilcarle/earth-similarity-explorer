@@ -4,6 +4,11 @@ docs/
 # Secrets
 .env
 
+# Python: virtual environment, bytecode, build output
+.venv/
+__pycache__/
+dist/
+
 # macOS
 .DS_Store
 
