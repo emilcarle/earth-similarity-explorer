@@ -1,0 +1,17 @@
+# Planning docs: a separate private git repository
+docs/
+
+# Secrets
+.env
+
+# macOS
+.DS_Store
+
+# Editor settings
+.vscode/settings.json
+
+# Claude system prompts
+CLAUDE.md
+
+# Throwaway frontend spike (M0)
+spike/
