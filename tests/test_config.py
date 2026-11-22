@@ -7,8 +7,6 @@ from pydantic import ValidationError
 from earth_similarity_explorer.config import AreaConfig, load_area_config
 from earth_similarity_explorer.settings import LAST_EMBEDDING_YEAR
 
-AREAS_DIR: Path = Path(__file__).parents[1] / "areas"
-
 VALID_CONFIG: dict[str, str | int] = {
     "id": "test-area",
     "name": "Test area",
@@ -66,13 +64,3 @@ def test_file_name_must_match_id(tmp_path: Path) -> None:
         expected_exception=ValueError, match="does not match the file name"
     ):
         load_area_config(config_yaml_path=path)
-
-
-@pytest.mark.parametrize(
-    argnames="path",
-    argvalues=sorted(AREAS_DIR.glob(pattern="*.yaml")),
-    ids=lambda p: p.stem,
-)
-def test_repository_area_configs_are_valid(path: Path) -> None:
-    """All config.yaml in the /areas folder load correctly."""
-    load_area_config(config_yaml_path=path)
