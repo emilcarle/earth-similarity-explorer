@@ -1,5 +1,0 @@
-# Development area: all development and tuning happens here. Never published.
-id: munich-garmisch
-name: Munich to Garmisch-Partenkirchen
-year: 2024
-boundary: geometries/munich-garmisch.geojson
