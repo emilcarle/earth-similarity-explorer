@@ -762,9 +762,11 @@ version = "0.1.0"
 source = { editable = "." }
 dependencies = [
     { name = "earthengine-api" },
+    { name = "google-auth" },
     { name = "pydantic" },
     { name = "pydantic-settings" },
     { name = "pyyaml" },
+    { name = "requests" },
     { name = "shapely" },
 ]
 
@@ -782,9 +784,11 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "earthengine-api", specifier = ">=1.7.53" },
+    { name = "google-auth", specifier = ">=2.63.1" },
     { name = "pydantic", specifier = ">=2.14.4" },
     { name = "pydantic-settings", specifier = ">=2.16.3" },
     { name = "pyyaml", specifier = ">=6.0.4" },
+    { name = "requests", specifier = ">=2.34.2" },
     { name = "shapely", specifier = ">=2.2.0" },
 ]
 
