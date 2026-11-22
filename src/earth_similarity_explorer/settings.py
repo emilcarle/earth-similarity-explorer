@@ -15,6 +15,8 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 EMBEDDING_COLLECTION_ID: str = "GOOGLE/SATELLITE_EMBEDDING/V1/ANNUAL"
 FIRST_EMBEDDING_YEAR: int = 2017
 LAST_EMBEDDING_YEAR: int = 2024
+# Pixel size of the alphaearth embeddings in m
+EMBEDDING_PIXEL_SIZE_M: int = 10
 
 # Max length for the area name (rendered in the application)
 AREA_NAME_MAX_LENGTH: int = 100
