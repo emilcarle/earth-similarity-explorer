@@ -3,7 +3,7 @@
 from pathlib import Path
 
 import shapely
-from shapely import GeometryCollection, MultiPolygon, Polygon
+from shapely import GeometryCollection, MultiPolygon, Point, Polygon
 from shapely.geometry.base import BaseGeometry
 
 
@@ -29,7 +29,9 @@ def load_boundary(path: Path) -> Polygon | MultiPolygon:
     raise ValueError(f"{path}: expected a Polygon or MultiPolygon")
 
 
-def define_utm_zone(boundary: Polygon | MultiPolygon) -> int:
-    """Return the UTM zone containing the boundary's centroid."""
-    # Zones are 6° wide, numbered from 1 at 180° W
-    return int((boundary.centroid.x + 180) // 6) + 1
+def define_utm_epsg(boundary: Polygon | MultiPolygon) -> str:
+    """Return the EPSG code of the UTM zone containing the boundary's centroid."""
+    centroid: Point = boundary.centroid
+    # Zones are 6° wide, numbered from 1 at 180° W; EPSG 326xx is north, 327xx south
+    zone: int = int((centroid.x + 180) // 6) + 1
+    return f"EPSG:{326 if centroid.y >= 0 else 327}{zone:02d}"

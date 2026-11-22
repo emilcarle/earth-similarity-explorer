@@ -6,7 +6,7 @@ from shapely import MultiPolygon, Point, Polygon, box
 from shapely.geometry import mapping
 from shapely.geometry.base import BaseGeometry
 
-from earth_similarity_explorer.boundary import define_utm_zone, load_boundary
+from earth_similarity_explorer.boundary import define_utm_epsg, load_boundary
 from earth_similarity_explorer.config import AreaConfig, load_area_config
 
 REPOSITORY_ROOT: Path = Path(__file__).parents[1]
@@ -22,7 +22,7 @@ TWO_CIRCLES: MultiPolygon = MultiPolygon(
 def write_geojson(directory: Path, geometries: list[BaseGeometry]) -> Path:
     """Write the geometries as a GeoJSON FeatureCollection, one feature each."""
     features: list[dict[str, object]] = [
-        {"type": "Feature", "properties": {}, "geometry": mapping(geometry)}
+        {"type": "Feature", "properties": {}, "geometry": mapping(ob=geometry)}
         for geometry in geometries
     ]
     path: Path = directory / "boundary.geojson"
@@ -75,19 +75,23 @@ def test_invalid_boundary_fails(
 
 
 @pytest.mark.parametrize(
-    argnames=("west", "east", "zone"),
+    argnames=("boundary", "epsg"),
     argvalues=[
-        (11.27, 11.35, 32),  # entirely in zone 32 (6° E to 12° E)
-        (11.0, 14.0, 33),  # crosses 12° E, centroid at 12.5° E
-        (10.0, 12.5, 32),  # crosses 12° E, centroid at 11.25° E
+        (box(xmin=11.27, ymin=52, xmax=11.35, ymax=53), "EPSG:32632"),  # in zone 32
+        (box(xmin=11.0, ymin=52, xmax=14.0, ymax=53), "EPSG:32633"),  # centroid 12.5° E
+        (
+            box(xmin=10.0, ymin=52, xmax=12.5, ymax=53),
+            "EPSG:32632",
+        ),  # centroid 11.25° E
+        (box(xmin=151.0, ymin=-34, xmax=151.3, ymax=-33.7), "EPSG:32756"),  # Sydney
     ],
-    ids=["one-zone", "mostly-east", "mostly-west"],
+    ids=["one-zone", "mostly-east", "mostly-west", "southern-hemisphere"],
 )
-def test_define_utm_zone_contains_centroid(west: float, east: float, zone: int) -> None:
-    """The UTM zone is the one containing the area's centroid."""
-    boundary: Polygon = box(xmin=west, ymin=52, xmax=east, ymax=53)
-
-    assert define_utm_zone(boundary=boundary) == zone
+def test_define_utm_epsg_contains_centroid(
+    boundary: Polygon | MultiPolygon, epsg: str
+) -> None:
+    """The EPSG code is the UTM zone and hemisphere containing the area's centroid."""
+    assert define_utm_epsg(boundary=boundary) == epsg
 
 
 @pytest.mark.parametrize(
