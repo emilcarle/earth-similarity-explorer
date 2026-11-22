@@ -6,7 +6,7 @@ DVC can track them.
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-# FIXED VALUES: identical on every machine, changed only by a code change. 
+# FIXED VALUES: identical on every machine, changed only by a code change.
 # Reading without .env (relevant for CI)
 
 # The AlphaEarth annual embeddings in Earth Engine, and the years they cover. Raise
