@@ -5,7 +5,7 @@ import yaml
 from pydantic import ValidationError
 
 from earth_similarity_explorer.config import AreaConfig, load_area_config
-from earth_similarity_explorer.constants import LAST_EMBEDDING_YEAR
+from earth_similarity_explorer.settings import LAST_EMBEDDING_YEAR
 
 AREAS_DIR: Path = Path(__file__).parents[1] / "areas"
 

@@ -6,7 +6,7 @@ from typing import Any
 import yaml
 from pydantic import BaseModel, ConfigDict, Field
 
-from earth_similarity_explorer.constants import (
+from earth_similarity_explorer.settings import (
     AREA_NAME_MAX_LENGTH,
     FIRST_EMBEDDING_YEAR,
     LAST_EMBEDDING_YEAR,
