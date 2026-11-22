@@ -14,9 +14,9 @@ from earth_similarity_explorer.settings import (
 
 
 class AreaConfig(BaseModel):
-    """
-    The definition of a study area: id, name, target embedding year, boundary geometry.
-    The paths are relative to the repository root and not checked by pydantic here.
+    """The definition of a study area: id, name, target embedding year, boundary.
+
+    The boundary path is relative to the repository root and not checked here.
     """
 
     model_config = ConfigDict(extra="forbid", frozen=True, str_strip_whitespace=True)
@@ -32,8 +32,8 @@ class AreaConfig(BaseModel):
 def load_area_config(config_yaml_path: Path) -> AreaConfig:
     """Read an area config from a YAML file and validate it.
 
-    The file must be named after the area's id, e.g. ``areas/munich-garmisch.yaml``
-    for the id ``munich-garmisch``.
+    The file must be named after the area's id, e.g. ``areas/schlehdorf.yaml`` for
+    the id ``schlehdorf``.
 
     Raises:
         FileNotFoundError: the file does not exist.
@@ -44,7 +44,7 @@ def load_area_config(config_yaml_path: Path) -> AreaConfig:
     data: Any = yaml.safe_load(stream=text)
     config: AreaConfig = AreaConfig.model_validate(obj=data)
 
-    # Ensure that copied files with old id's are not accidently overwriting other study areas.
+    # A copied file with an unchanged id would overwrite another area's outputs
     if config.id != config_yaml_path.stem:
         raise ValueError(
             f"{config_yaml_path}: id {config.id!r} does not match the file name "

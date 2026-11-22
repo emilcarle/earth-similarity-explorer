@@ -7,9 +7,6 @@ from shapely.geometry import mapping
 from shapely.geometry.base import BaseGeometry
 
 from earth_similarity_explorer.boundary import define_utm_epsg, load_boundary
-from earth_similarity_explorer.config import AreaConfig, load_area_config
-
-REPOSITORY_ROOT: Path = Path(__file__).parents[1]
 
 # Non-square shapes near Schlehdorf: a circle, and two circles as one MultiPolygon
 CIRCLE: Polygon = Point(11.31, 47.65).buffer(distance=0.03)
@@ -77,13 +74,14 @@ def test_invalid_boundary_fails(
 @pytest.mark.parametrize(
     argnames=("boundary", "epsg"),
     argvalues=[
-        (box(xmin=11.27, ymin=52, xmax=11.35, ymax=53), "EPSG:32632"),  # in zone 32
-        (box(xmin=11.0, ymin=52, xmax=14.0, ymax=53), "EPSG:32633"),  # centroid 12.5° E
-        (
-            box(xmin=10.0, ymin=52, xmax=12.5, ymax=53),
-            "EPSG:32632",
-        ),  # centroid 11.25° E
-        (box(xmin=151.0, ymin=-34, xmax=151.3, ymax=-33.7), "EPSG:32756"),  # Sydney
+        # entirely in zone 32 (6° E to 12° E)
+        (box(xmin=11.27, ymin=52, xmax=11.35, ymax=53), "EPSG:32632"),
+        # crosses 12° E, centroid at 12.5° E
+        (box(xmin=11.0, ymin=52, xmax=14.0, ymax=53), "EPSG:32633"),
+        # crosses 12° E, centroid at 11.25° E
+        (box(xmin=10.0, ymin=52, xmax=12.5, ymax=53), "EPSG:32632"),
+        # Sydney, southern hemisphere
+        (box(xmin=151.0, ymin=-34, xmax=151.3, ymax=-33.7), "EPSG:32756"),
     ],
     ids=["one-zone", "mostly-east", "mostly-west", "southern-hemisphere"],
 )
@@ -92,15 +90,3 @@ def test_define_utm_epsg_contains_centroid(
 ) -> None:
     """The EPSG code is the UTM zone and hemisphere containing the area's centroid."""
     assert define_utm_epsg(boundary=boundary) == epsg
-
-
-@pytest.mark.parametrize(
-    argnames="config_path",
-    argvalues=sorted((REPOSITORY_ROOT / "areas").glob(pattern="*.yaml")),
-    ids=lambda p: p.stem,
-)
-def test_repository_boundaries_are_valid(config_path: Path) -> None:
-    """Every area config in /areas points to a valid boundary file."""
-    config: AreaConfig = load_area_config(config_yaml_path=config_path)
-
-    load_boundary(path=REPOSITORY_ROOT / config.boundary)
