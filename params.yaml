@@ -1,7 +1,7 @@
 # Tuned pipeline parameters. DVC tracks each key, so a change reruns only the stages
 # that use it. Loaded and validated by earth_similarity_explorer/params.py.
 
-# Areas that `dvc repro` builds; each needs a config in areas/<id>.yaml
+# Areas that `dvc repro` builds. Each needs a config in areas/<id>.yaml
 areas:
   - schlehdorf
 

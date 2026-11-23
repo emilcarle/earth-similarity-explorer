@@ -23,6 +23,8 @@ def test_area_config_and_boundary_are_valid(config_path: Path) -> None:
     config: AreaConfig = load_area_config(config_yaml_path=config_path)
 
     load_boundary(path=REPOSITORY_ROOT / config.boundary)
+    # dvc.yaml finds the boundary by this name, not by reading the config
+    assert config.boundary == Path("data/geometries") / f"{config.id}.geojson"
 
 
 def test_params_are_valid_and_list_existing_areas() -> None:

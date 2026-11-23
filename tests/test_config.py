@@ -11,7 +11,7 @@ VALID_CONFIG: dict[str, str | int] = {
     "id": "test-area",
     "name": "Test area",
     "year": 2024,
-    "boundary": "geometries/test-area.geojson",
+    "boundary": "data/geometries/test-area.geojson",
 }
 
 
@@ -31,7 +31,7 @@ def test_valid_config_loads(tmp_path: Path) -> None:
 
     assert config.id == "test-area"
     assert config.year == 2024
-    assert config.boundary == Path("geometries/test-area.geojson")
+    assert config.boundary == Path("data/geometries/test-area.geojson")
 
 
 @pytest.mark.parametrize(
