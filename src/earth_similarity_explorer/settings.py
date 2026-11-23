@@ -34,6 +34,8 @@ EMBEDDING_INT8_SCALE: int = 127
 DRIVE_EXPORT_FOLDER: str = "earth-similarity-explorer"
 # The Drive REST API (v3) lists files at this URL and serves each file at URL/<id>
 DRIVE_FILES_URL: str = "https://www.googleapis.com/drive/v3/files"
+# The API sends each score as one byte, with −1 as 0 and 1 as this value
+SCORE_BYTE_MAX: int = 255
 
 # Frontend Specifications
 # Max length for the area name (rendered in the application)

@@ -51,13 +51,13 @@ stages:
       size: 927183
     - path: src/earth_similarity_explorer/vectors.py
       hash: md5
-      md5: 420cd052480cccf186d891d4b4c894ed
-      size: 4441
+      md5: 4671cf941367c4f450a5712cb38f76c0
+      size: 4481
     params:
       src/earth_similarity_explorer/settings.py:
         EMBEDDING_INT8_SCALE: 127
     outs:
     - path: data/vectors/schlehdorf_grid.parquet
       hash: md5
-      md5: e3bcecfaaa4ddb2146e8ff2a2a76659e
-      size: 214598
+      md5: 205ca6f85af24c3677ed7b7600df0570
+      size: 214622
