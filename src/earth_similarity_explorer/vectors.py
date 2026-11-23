@@ -23,9 +23,9 @@ from earth_similarity_explorer.settings import (
 def build_vector_table(
     means: np.ndarray, pixel_counts: np.ndarray, x: np.ndarray, y: np.ndarray
 ) -> pd.DataFrame:
-    """Return one row per unit with its centre, pixel count, homogeneity and vector.
+    """Return one row per segment with its centre, pixel count, homogeneity and vector.
 
-    Means holds each unit's raw mean embedding (N × 64) and x, y (its centroid in UTM metres).
+    Means holds each segment's raw mean embedding (N × 64) and x, y (its centroid in UTM metres).
     Rows are sorted north to south, then west to east.
     """
     # The length of the raw mean is 1 when all pixels are alike and lower when mixed.
@@ -51,12 +51,14 @@ def build_vector_table(
     table: DataFrame = table.sort_values(
         by=["y", "x"], ascending=[False, True], kind="stable", ignore_index=True
     )
-    # Add unit_id column based on the order.
-    table.insert(loc=0, column="unit_id", value=np.arange(len(table), dtype=np.int32))
+    # Add segment_id column based on the order.
+    table.insert(
+        loc=0, column="segment_id", value=np.arange(len(table), dtype=np.int32)
+    )
     return table
 
 
-# READERS (one per unit kind) return the inputs for build_vector_table
+# READERS (one per segmentation kind) return the inputs for build_vector_table
 def read_grid_segmentation(
     path: Path,
 ) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
@@ -101,11 +103,11 @@ def main() -> None:
         means=means, pixel_counts=pixel_counts, x=x, y=y
     )
 
-    # Write the table as Parquet without pandas' index because unit_id numbers the rows
+    # Write the table as Parquet without pandas' index because segment_id numbers the rows
     VECTORS_DIR.mkdir(parents=True, exist_ok=True)
     path: Path = VECTORS_DIR / f"{area_id}_grid.parquet"
     table.to_parquet(path=path, index=False)
-    print(f"Wrote {len(table)} units to {path}", flush=True)
+    print(f"Wrote {len(table)} segments to {path}", flush=True)
 
 
 if __name__ == "__main__":

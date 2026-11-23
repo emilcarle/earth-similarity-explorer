@@ -16,7 +16,7 @@ from earth_similarity_explorer.vectors import build_vector_table, read_grid_segm
 def make_table(
     first_two: list[tuple[float, float]], centres: list[tuple[float, float]]
 ) -> pd.DataFrame:
-    """Build a table from units whose mean has only A00 and A01 set."""
+    """Build a table from segments whose mean has only A00 and A01 set."""
     means: np.ndarray = np.zeros(shape=(len(first_two), len(EMBEDDING_BANDS)))
     means[:, :2] = first_two
     xy: np.ndarray = np.array(object=centres)
@@ -34,14 +34,14 @@ def test_table_has_the_shared_columns_and_types() -> None:
     table: pd.DataFrame = make_table(first_two=[(0.6, 0.8)], centres=[(50.0, 50.0)])
 
     assert list(table.columns) == [
-        "unit_id",
+        "segment_id",
         "x",
         "y",
         "pixel_count",
         "homogeneity",
         *EMBEDDING_BANDS,
     ]
-    assert table["unit_id"].dtype == np.int32
+    assert table["segment_id"].dtype == np.int32
     assert table["pixel_count"].dtype == np.int32
     assert table["homogeneity"].dtype == np.float32
     assert (table[EMBEDDING_BANDS].dtypes == np.int8).all()
@@ -59,20 +59,20 @@ def test_mean_becomes_homogeneity_and_int8_unit_vector() -> None:
 
 
 def test_rows_run_north_to_south_then_west_to_east() -> None:
-    """Rows are sorted by centre, and unit_id is the new row number."""
+    """Rows are sorted by centre, and segment_id is the new row number."""
     # Given as south-east, north-west, north-east
     table: pd.DataFrame = make_table(
         first_two=[(1.0, 0.0)] * 3,
         centres=[(150.0, 50.0), (50.0, 150.0), (150.0, 150.0)],
     )
 
-    assert table["unit_id"].tolist() == [0, 1, 2]
+    assert table["segment_id"].tolist() == [0, 1, 2]
     assert table[["x", "y"]].values.tolist() == [
         [50.0, 150.0],
         [150.0, 150.0],
         [150.0, 50.0],
     ]
-    # Pixel counts 1, 2, 3 came in input order and moved with their units
+    # Pixel counts 1, 2, 3 came in input order and moved with their segments
     assert table["pixel_count"].tolist() == [2, 3, 1]
 
 
