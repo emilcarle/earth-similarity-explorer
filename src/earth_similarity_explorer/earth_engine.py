@@ -46,7 +46,7 @@ def wait_for_task(task: Any, label: str) -> dict[str, Any]:
             "",
         )
         state: str = f"{metadata['state']} {metadata.get('progress', 0):.0%} {stage}"
-        # A change, or 30 s without a line: shows that a long task is still alive
+        # Print on every change or after 30 s without a line to show a long task is alive
         if state != last_state or time.monotonic() - last_print >= 30:
             minutes, seconds = divmod(int(time.monotonic() - started), 60)
             eecu_hours: float = metadata.get("batchEecuUsageSeconds", 0) / 3600
@@ -98,7 +98,7 @@ def export_to_drive(
     task.start()
     metadata: dict[str, Any] = wait_for_task(task=task, label=file_prefix)
 
-    # The finished task links the Drive folder it wrote to: .../#folders/<folder id>
+    # The finished task links the Drive folder it wrote to as .../#folders/<id>
     return metadata["destinationUris"][0].rsplit("/", 1)[-1]
 
 

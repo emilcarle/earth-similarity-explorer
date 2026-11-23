@@ -1,10 +1,10 @@
-# Planning docs: a separate private git repository
+# Planning docs in a separate private git repository
 docs/
 
 # Secrets
 .env
 
-# Python: virtual environment, bytecode, build output
+# Python virtual environment, bytecode and build output
 .venv/
 __pycache__/
 dist/

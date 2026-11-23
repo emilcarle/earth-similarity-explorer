@@ -1,6 +1,6 @@
 """
 Create quereable vector tables for areas based on input .tif files (clustered in Earth Engine).
-Run from the project root: uv run python -m earth_similarity_explorer.vectors <area id>
+Run from the project root with uv run python -m earth_similarity_explorer.vectors <area id>
 """
 
 import argparse
@@ -28,7 +28,7 @@ def build_vector_table(
     Means holds each unit's raw mean embedding (N × 64) and x, y (its centroid in UTM metres).
     Rows are sorted north to south, then west to east.
     """
-    # The length of the raw mean: 1 when all pixels are alike, lower when mixed.
+    # The length of the raw mean is 1 when all pixels are alike and lower when mixed.
     # keepdims returns it as a column (N × 1), so each row is divided by its own length
     homogeneity: np.ndarray = np.linalg.norm(x=means, axis=1, keepdims=True)
     # Set the vector to unit length, so a dot product of two vectors is their cosine similarity
@@ -56,7 +56,7 @@ def build_vector_table(
     return table
 
 
-# READERS: one per unit kind, each returning the inputs for build_vector_table
+# READERS (one per unit kind) return the inputs for build_vector_table
 def read_grid_segmentation(
     path: Path,
 ) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
@@ -71,7 +71,7 @@ def read_grid_segmentation(
     means_raster: np.ndarray = bands[[names.index(band) for band in EMBEDDING_BANDS]]
     count_raster: np.ndarray = bands[names.index("pixel_count")]
 
-    # Mask cells inside the area: their pixel count is not NaN
+    # Cells inside the area have a pixel count that is not NaN
     inside: np.ndarray = ~np.isnan(count_raster)
     # Get values of the pixels inside the mask (aka. unmasked)
     pixel_counts: np.ndarray = count_raster[inside]
@@ -101,7 +101,7 @@ def main() -> None:
         means=means, pixel_counts=pixel_counts, x=x, y=y
     )
 
-    # Write the table as Parquet, without pandas' index: unit_id already numbers the rows
+    # Write the table as Parquet without pandas' index because unit_id numbers the rows
     VECTORS_DIR.mkdir(parents=True, exist_ok=True)
     path: Path = VECTORS_DIR / f"{area_id}_grid.parquet"
     table.to_parquet(path=path, index=False)

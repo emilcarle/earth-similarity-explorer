@@ -1,4 +1,4 @@
-# Git hooks run before every commit. Install once per clone: uv run pre-commit install
+# Git hooks run before every commit. Install them once per clone with uv run pre-commit install
 # Local hooks with `uv run` use the ruff version locked in uv.lock, like CI.
 repos:
   - repo: local
