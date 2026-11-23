@@ -6,7 +6,7 @@ stages:
   grid:
     foreach: ${areas}
     do:
-      desc: Create grid clusters of mean embeddings with Earth Engine
+      desc: Create the grid segmentation of mean embeddings with Earth Engine
       cmd: uv run python -m earth_similarity_explorer.grid ${item}
       deps:
         - src/earth_similarity_explorer/grid.py
@@ -24,4 +24,19 @@ stages:
             - EMBEDDING_COLLECTION_ID
             - EMBEDDING_PIXEL_SIZE_M
       outs:
-        - data/grid_clusters/${item}_grid.tif
+        - data/grid_segmentation/${item}_grid.tif
+
+  vectors:
+    foreach: ${areas}
+    do:
+      desc: One table row per grid cell, with its renormalized int8 vector
+      cmd: uv run python -m earth_similarity_explorer.vectors ${item}
+      deps:
+        - src/earth_similarity_explorer/vectors.py
+        # The grid stage's output, so DVC runs grid first and vectors after it
+        - data/grid_segmentation/${item}_grid.tif
+      params:
+        - src/earth_similarity_explorer/settings.py:
+            - EMBEDDING_INT8_SCALE
+      outs:
+        - data/vectors/${item}_grid.parquet

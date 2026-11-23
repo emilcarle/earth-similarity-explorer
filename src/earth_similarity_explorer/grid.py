@@ -1,4 +1,4 @@
-"""Construction of grid clustering based on mean embeddings (the segmentation baseline).
+"""Construction of grid segmentation based on mean embeddings (the segmentation baseline).
 Run from the project root: uv run python -m earth_similarity_explorer.grid <area id>
 """
 
@@ -20,7 +20,7 @@ from earth_similarity_explorer.settings import (
     DRIVE_EXPORT_FOLDER,
     EMBEDDING_COLLECTION_ID,
     EMBEDDING_PIXEL_SIZE_M,
-    GRID_CLUSTERS_DIR,
+    GRID_SEGMENTATION_DIR,
 )
 
 
@@ -66,7 +66,7 @@ def build_grid_image(
 def main() -> None:
     """Export the grid of the area named on the command line to the export folder."""
     parser: argparse.ArgumentParser = argparse.ArgumentParser(
-        description="Export the grid clustering of mean embeddings for one area."
+        description="Export the grid segmentation of mean embeddings for one area."
     )
     parser.add_argument("area_id", help="id of an area config in areas/")
     area_id: str = parser.parse_args().area_id
@@ -93,7 +93,7 @@ def main() -> None:
         crs_transform=[cell_size_m, 0, 0, 0, -cell_size_m, 0],
         drive_folder=DRIVE_EXPORT_FOLDER,
         file_prefix=f"{area_id}_grid",
-        destination_dir=GRID_CLUSTERS_DIR,
+        destination_dir=GRID_SEGMENTATION_DIR,
     )
 
 
