@@ -15,7 +15,8 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 # Project folders, relative to the project root, where DVC runs every stage
 AREAS_DIR: Path = Path("areas")
 DATA_DIR: Path = Path("data")
-GRID_CLUSTERS_DIR: Path = DATA_DIR / "grid_clusters"
+GRID_SEGMENTATION_DIR: Path = DATA_DIR / "grid_segmentation"
+VECTORS_DIR: Path = DATA_DIR / "vectors"
 
 # The AlphaEarth annual embeddings in Earth Engine, and the years they cover.
 # LAST_EMBEDDING_YEAR should be raised by hand when Google publishes a new year:
@@ -25,6 +26,8 @@ FIRST_EMBEDDING_YEAR: int = 2017
 LAST_EMBEDDING_YEAR: int = 2024
 # Pixel size of the alphaearth embeddings in m
 EMBEDDING_PIXEL_SIZE_M: int = 10
+# Names of the 64 embedding bands, A00 to A63 and the vector columns of tables
+EMBEDDING_BANDS: list[str] = [f"A{band:02d}" for band in range(64)]
 # Embedding values can be stored as int8 with a minor loss in precision: round(value × scale)
 EMBEDDING_INT8_SCALE: int = 127
 # Google Drive folder that Earth Engine exports to

@@ -25,8 +25,8 @@ stages:
       size: 6396
     - path: src/earth_similarity_explorer/grid.py
       hash: md5
-      md5: ea7dcde9792de26e6c2cc86044f28204
-      size: 3902
+      md5: 198c69dcd7baa7aeedd0f0cc832f634d
+      size: 3914
     - path: src/earth_similarity_explorer/params.py
       hash: md5
       md5: 946567f1e2ff0f8a35cf4f0e9ddd746d
@@ -38,7 +38,26 @@ stages:
         EMBEDDING_COLLECTION_ID: GOOGLE/SATELLITE_EMBEDDING/V1/ANNUAL
         EMBEDDING_PIXEL_SIZE_M: 10
     outs:
-    - path: data/grid_clusters/schlehdorf_grid.tif
+    - path: data/grid_segmentation/schlehdorf_grid.tif
       hash: md5
       md5: 1c0fcf2da29d3bd7a97af3a70f26b37a
       size: 927183
+  vectors@schlehdorf:
+    cmd: uv run python -m earth_similarity_explorer.vectors schlehdorf
+    deps:
+    - path: data/grid_segmentation/schlehdorf_grid.tif
+      hash: md5
+      md5: 1c0fcf2da29d3bd7a97af3a70f26b37a
+      size: 927183
+    - path: src/earth_similarity_explorer/vectors.py
+      hash: md5
+      md5: b807f998b0b444d4344dabf239711355
+      size: 4442
+    params:
+      src/earth_similarity_explorer/settings.py:
+        EMBEDDING_INT8_SCALE: 127
+    outs:
+    - path: data/vectors/schlehdorf_grid.parquet
+      hash: md5
+      md5: e3bcecfaaa4ddb2146e8ff2a2a76659e
+      size: 214598
