@@ -19,7 +19,7 @@ class GridParams(BaseModel):
 
 
 class Params(BaseModel):
-    """All tuned parameters; one section per pipeline stage."""
+    """All tuned parameters, one section per pipeline stage."""
 
     model_config = ConfigDict(extra="forbid", frozen=True)
 

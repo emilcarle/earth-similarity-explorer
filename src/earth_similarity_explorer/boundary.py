@@ -32,6 +32,6 @@ def load_boundary(path: Path) -> Polygon | MultiPolygon:
 def define_utm_epsg(boundary: Polygon | MultiPolygon) -> str:
     """Return the EPSG code of the UTM zone containing the boundary's centroid."""
     centroid: Point = boundary.centroid
-    # Zones are 6° wide, numbered from 1 at 180° W; EPSG 326xx is north, 327xx south
+    # Zones are 6° wide, numbered from 1 at 180° W. EPSG 326xx is north, 327xx south
     zone: int = int((centroid.x + 180) // 6) + 1
     return f"EPSG:{326 if centroid.y >= 0 else 327}{zone:02d}"

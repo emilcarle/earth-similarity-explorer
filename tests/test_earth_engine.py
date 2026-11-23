@@ -14,8 +14,8 @@ from earth_similarity_explorer.settings import EMBEDDING_COLLECTION_ID, Settings
 
 REPOSITORY_ROOT: Path = Path(__file__).parents[1]
 
-# These tests call Earth Engine, so they need credentials and EE_PROJECT in .env;
-# without them (e.g. in CI) the whole module is skipped
+# These tests call Earth Engine, so they need credentials and EE_PROJECT in .env.
+# Without them (e.g. in CI) the whole module is skipped
 try:
     Settings()
 except ValidationError:

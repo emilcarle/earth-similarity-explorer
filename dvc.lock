@@ -1,0 +1,44 @@
+schema: '2.0'
+stages:
+  grid@schlehdorf:
+    cmd: uv run python -m earth_similarity_explorer.grid schlehdorf
+    deps:
+    - path: areas/schlehdorf.yaml
+      hash: md5
+      md5: ee673c677532d954251c8c44eebec4ac
+      size: 170
+    - path: data/geometries/schlehdorf.geojson
+      hash: md5
+      md5: bd1ca954d1393efb0d0933991491aa76
+      size: 22594
+    - path: src/earth_similarity_explorer/boundary.py
+      hash: md5
+      md5: 849a277c4b9fa75cbf414d8c43ca1f90
+      size: 1651
+    - path: src/earth_similarity_explorer/config.py
+      hash: md5
+      md5: a74aa67ec38e5be29496199d960cfa38
+      size: 1825
+    - path: src/earth_similarity_explorer/earth_engine.py
+      hash: md5
+      md5: 4510b3ec403ef473272c5fd61faa3d62
+      size: 6396
+    - path: src/earth_similarity_explorer/grid.py
+      hash: md5
+      md5: ea7dcde9792de26e6c2cc86044f28204
+      size: 3902
+    - path: src/earth_similarity_explorer/params.py
+      hash: md5
+      md5: 946567f1e2ff0f8a35cf4f0e9ddd746d
+      size: 1064
+    params:
+      params.yaml:
+        grid.cell_size_m: 100
+      src/earth_similarity_explorer/settings.py:
+        EMBEDDING_COLLECTION_ID: GOOGLE/SATELLITE_EMBEDDING/V1/ANNUAL
+        EMBEDDING_PIXEL_SIZE_M: 10
+    outs:
+    - path: data/grid_clusters/schlehdorf_grid.tif
+      hash: md5
+      md5: 1c0fcf2da29d3bd7a97af3a70f26b37a
+      size: 927183

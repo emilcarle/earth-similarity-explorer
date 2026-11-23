@@ -1,0 +1,27 @@
+# The pipeline. `uv run dvc repro` runs every stage whose code, inputs or parameters
+# changed since the last run, and skips the rest. Each stage repeats for every area
+# in the `areas` list of params.yaml.
+
+stages:
+  grid:
+    foreach: ${areas}
+    do:
+      desc: Create grid clusters of mean embeddings with Earth Engine
+      cmd: uv run python -m earth_similarity_explorer.grid ${item}
+      deps:
+        - src/earth_similarity_explorer/grid.py
+        - src/earth_similarity_explorer/boundary.py
+        - src/earth_similarity_explorer/config.py
+        - src/earth_similarity_explorer/earth_engine.py
+        - src/earth_similarity_explorer/params.py
+        - areas/${item}.yaml
+        - data/geometries/${item}.geojson
+      params:
+        - grid.cell_size_m
+        # Reading only constants from settings.py instead of the whole file.
+        # This avoid re-running the task due to irrelevant changes to settings.py.
+        - src/earth_similarity_explorer/settings.py:
+            - EMBEDDING_COLLECTION_ID
+            - EMBEDDING_PIXEL_SIZE_M
+      outs:
+        - data/grid_clusters/${item}_grid.tif
