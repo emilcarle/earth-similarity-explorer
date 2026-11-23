@@ -14,7 +14,7 @@ from earth_similarity_explorer.settings import (
 
 
 class AreaConfig(BaseModel):
-    """The definition of a study area: id, name, target embedding year, boundary.
+    """The definition of a study area with id, name, target embedding year and boundary.
 
     The boundary path is relative to the repository root and not checked here.
     """

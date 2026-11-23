@@ -8,7 +8,7 @@ from shapely.geometry.base import BaseGeometry
 
 from earth_similarity_explorer.boundary import define_utm_epsg, load_boundary
 
-# Non-square shapes near Schlehdorf: a circle, and two circles as one MultiPolygon
+# Non-square shapes near Schlehdorf (a circle and two circles as one MultiPolygon)
 CIRCLE: Polygon = Point(11.31, 47.65).buffer(distance=0.03)
 TWO_CIRCLES: MultiPolygon = MultiPolygon(
     polygons=[CIRCLE, Point(11.45, 47.65).buffer(distance=0.03)]
@@ -50,7 +50,7 @@ def test_valid_boundary_loads(tmp_path: Path, geometry: BaseGeometry) -> None:
     argvalues=[
         ([CIRCLE, CIRCLE], "exactly one feature"),
         ([Point(11.31, 47.65)], "Polygon or MultiPolygon"),
-        # A bow tie: the ring crosses itself
+        # A bow tie whose ring crosses itself
         (
             [Polygon(shell=[(11.3, 47.6), (11.4, 47.7), (11.4, 47.6), (11.3, 47.7)])],
             "not valid",

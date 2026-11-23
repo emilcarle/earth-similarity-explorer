@@ -10,7 +10,7 @@ from earth_similarity_explorer.settings import EMBEDDING_PIXEL_SIZE_M
 
 
 class GridParams(BaseModel):
-    """The grid baseline: square cells of mean embeddings."""
+    """The grid baseline of square cells with mean embeddings."""
 
     model_config = ConfigDict(extra="forbid", frozen=True)
 

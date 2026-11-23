@@ -1,4 +1,4 @@
-"""Tests for the vectors stage: the table every unit kind shares, and its readers."""
+"""Tests for the vectors stage with its shared table and its readers."""
 
 from pathlib import Path
 
@@ -72,7 +72,7 @@ def test_rows_run_north_to_south_then_west_to_east() -> None:
         [150.0, 150.0],
         [150.0, 50.0],
     ]
-    # Each unit's other columns move with it: pixel counts 1, 2, 3 were given in input order
+    # Pixel counts 1, 2, 3 came in input order and moved with their units
     assert table["pixel_count"].tolist() == [2, 3, 1]
 
 
@@ -96,7 +96,7 @@ def test_grid_reader_returns_cells_with_pixels_and_their_centres(
         crs="EPSG:32632",
         transform=from_origin(west=670500, north=5283200, xsize=100, ysize=100),
     ) as dataset:
-        # pixel_count first: the reader must find bands by name, not by position
+        # pixel_count comes first so the reader must find bands by name and not by position
         dataset.write(np.concatenate((pixel_count[np.newaxis], means)))
         dataset.descriptions = ("pixel_count", *EMBEDDING_BANDS)
 

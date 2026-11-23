@@ -35,6 +35,8 @@ addopts = ["--strict-markers"]
 [dependency-groups]
 dev = [
     "dvc>=3.67.1",
+    "ipykernel>=7.4.0",
+    "ipyleaflet>=0.20.0",
     "pandas-stubs>=3.1.0.261029",
     "pre-commit>=4.7.0",
     "pytest>=9.2.0",

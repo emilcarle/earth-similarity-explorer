@@ -1,4 +1,4 @@
-"""Checks on the project's own data files: params.yaml, area configs and boundaries."""
+"""Checks on params.yaml, the area configs and the boundaries."""
 
 from pathlib import Path
 

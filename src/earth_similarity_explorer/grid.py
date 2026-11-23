@@ -1,5 +1,5 @@
 """Construction of grid segmentation based on mean embeddings (the segmentation baseline).
-Run from the project root: uv run python -m earth_similarity_explorer.grid <area id>
+Run from the project root with uv run python -m earth_similarity_explorer.grid <area id>
 """
 
 import argparse
@@ -29,8 +29,8 @@ def build_grid_image(
 ) -> ee.Image:
     """Return the mean embedding and pixel count of every grid cell as float32.
 
-    Bands: A00–A63, the mean of the pixels inside the region (not renormalized) +
-    pixel_count. Cells outside the area are masked (NaN in the GeoTIFF).
+    Bands A00–A63 hold the mean of the pixels inside the region (not renormalized)
+    and pixel_count holds their number. Cells outside the area are masked (NaN in the GeoTIFF).
     """
     pixels_per_cell: int = (cell_size_m // EMBEDDING_PIXEL_SIZE_M) ** 2
 
@@ -85,8 +85,8 @@ def main() -> None:
         image=build_grid_image(
             region=region, year=config.year, crs=crs, cell_size_m=cell_size_m
         ),
-        # A rectangle one cell wider than the area: the polygon itself would mask
-        # whole edge cells, and with them their pixels inside. clip() alone decides
+        # Export a rectangle one cell wider than the area because the polygon itself
+        # would mask whole edge cells and with them their pixels inside. clip() alone decides
         region=region.buffer(distance=cell_size_m).bounds(),
         crs=crs,
         # Cells anchored at (0, 0), so their edges lie on the 10 m pixel grid

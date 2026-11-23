@@ -5,6 +5,6 @@
 areas:
   - schlehdorf
 
-# The grid baseline: square cells of mean embeddings
+# The grid baseline of square cells with mean embeddings
 grid:
   cell_size_m: 100
