@@ -13,3 +13,11 @@ repos:
         entry: uv run ruff format
         language: system
         types: [python]
+      # Biome formats and lints the web page, with the version locked in web/package-lock.json
+      - id: biome-check
+        name: biome check --write
+        # Runs inside web/, so the paths pre-commit passes lose their web/ prefix
+        entry: bash -c 'cd web && node_modules/.bin/biome check --write --no-errors-on-unmatched --files-ignore-unknown=true "${@#web/}"' --
+        language: system
+        files: ^web/
+        types_or: [ts, javascript, json]

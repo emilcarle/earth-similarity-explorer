@@ -1,6 +1,7 @@
 """Tests for the search API."""
 
 from collections.abc import Iterator
+from io import BytesIO
 from pathlib import Path
 
 import numpy as np
@@ -8,6 +9,7 @@ import pandas as pd
 import pytest
 from fastapi.testclient import TestClient
 from httpx import Response
+from PIL import Image
 
 from earth_similarity_explorer import api
 from earth_similarity_explorer.settings import EMBEDDING_BANDS
@@ -57,23 +59,64 @@ def test_similar_returns_one_byte_per_segment_in_segment_id_order(
     assert list(response.content) == [255, 128, 0]
 
 
+def test_area_metadata_places_the_id_raster(client: TestClient) -> None:
+    """The metadata gives the ID raster's top-left corner, pixel size and shape."""
+    response: Response = client.get(url="/areas/test")
+
+    # Three 100 m segments in one row whose centres lie at y 50 span y 0 to 100
+    assert response.json() == {
+        "west": 0.0,
+        "north": 100.0,
+        "pixel_size_m": 100,
+        "width": 3,
+        "height": 1,
+        "segment_count": 3,
+    }
+
+
+def test_segment_ids_png_holds_each_segment_id_at_its_pixel(client: TestClient) -> None:
+    """The ID raster arrives as a PNG whose pixels decode to the segment IDs."""
+    response: Response = client.get(url="/areas/test/segment_ids.png")
+
+    assert response.headers["content-type"] == "image/png"
+    rgb: np.ndarray = np.asarray(Image.open(fp=BytesIO(response.content)))
+    # IDs below 256 have only a low byte, so R and G are 0 and B is the ID
+    assert rgb[..., 2].tolist() == [[0, 1, 2]]
+    assert not rgb[..., :2].any()
+
+
 @pytest.mark.parametrize(
-    argnames=("area", "segment", "status_code"),
+    argnames="url",
     argvalues=[
-        # An area without a vectors table
-        ("nowhere", 0, 404),
-        # One past the last segment
-        ("test", 3, 404),
-        # Negative IDs are rejected before the endpoint runs
-        ("test", -1, 422),
+        "/areas/nowhere",
+        "/areas/nowhere/segment_ids.png",
+        "/areas/nowhere/similar?segment=0",
     ],
 )
-def test_similar_rejects_unknown_areas_and_segments(
-    client: TestClient, area: str, segment: int, status_code: int
+def test_unknown_area_returns_404_on_every_area_endpoint(
+    client: TestClient, url: str
 ) -> None:
-    """Searches for an area or segment that doesn't exist return an error status."""
+    """An area without a vectors table is not found, whatever is asked about it."""
+    response: Response = client.get(url=url)
+
+    assert response.status_code == 404
+
+
+@pytest.mark.parametrize(
+    argnames=("segment", "status_code"),
+    argvalues=[
+        # One past the last segment
+        (3, 404),
+        # Negative IDs are rejected before the endpoint runs
+        (-1, 422),
+    ],
+)
+def test_similar_rejects_segments_outside_the_area(
+    client: TestClient, segment: int, status_code: int
+) -> None:
+    """Searches for a segment that doesn't exist return an error status."""
     response: Response = client.get(
-        url=f"/areas/{area}/similar", params={"segment": segment}
+        url="/areas/test/similar", params={"segment": segment}
     )
 
     assert response.status_code == status_code

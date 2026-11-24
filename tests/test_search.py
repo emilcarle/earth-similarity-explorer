@@ -66,7 +66,7 @@ def test_load_vectors_returns_the_int8_matrix_in_segment_id_order(
 
 def test_encode_scores_maps_minus_one_to_one_onto_bytes() -> None:
     """Scores become bytes 0 to 255, and scores just outside −1 to 1 stay at the ends."""
-    # The ends, the middle, the design's example 0.93 and a rounded-up self-score
+    # The ends, the middle, an example (0.93) and a rounded-up self-score
     scores: np.ndarray = np.array(object=[-1.0, 0.0, 0.93, 1.0, 1.016])
 
     assert list(encode_scores(scores=scores)) == [0, 128, 246, 255, 255]

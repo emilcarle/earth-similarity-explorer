@@ -9,8 +9,8 @@ permissions:
   contents: read
 
 jobs:
-  checks:
-    name: Linting, type checking and testing
+  python:
+    name: Pipeline and API (Python)
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -40,3 +40,39 @@ jobs:
       - name: Testing
         if: ${{ !cancelled() && steps.sync.outcome == 'success' }}
         run: uv run pytest
+
+  web:
+    name: Webpage (TypeScript)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Install Node
+        uses: actions/setup-node@v7.1.0
+        with:
+          node-version-file: .node-version
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+
+      - name: Install dependencies
+        id: install
+        run: npm ci
+
+      - name: Formatting and linting
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
+        run: npx biome ci
+
+      - name: Type checking
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
+        run: npm run check
+
+      - name: Building
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
+        run: npm run build
