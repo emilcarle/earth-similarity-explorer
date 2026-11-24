@@ -12,7 +12,7 @@ from httpx import Response
 from PIL import Image
 
 from earth_similarity_explorer import api
-from earth_similarity_explorer.settings import EMBEDDING_BANDS
+from earth_similarity_explorer.settings import EMBEDDING_BANDS, GRID_FILE_SUFFIX
 from earth_similarity_explorer.vectors import build_vector_table
 
 
@@ -29,7 +29,7 @@ def client(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Iterator[TestClie
         x=np.array(object=[50.0, 150.0, 250.0]),
         y=np.array(object=[50.0, 50.0, 50.0]),
     )
-    table.to_parquet(path=tmp_path / "test_grid.parquet", index=False)
+    table.to_parquet(path=tmp_path / f"test{GRID_FILE_SUFFIX}.parquet", index=False)
 
     # The lifespan loads the tables from tmp_path instead of data/vectors
     monkeypatch.setattr(target=api, name="VECTORS_DIR", value=tmp_path)
@@ -79,7 +79,9 @@ def test_segment_ids_png_holds_each_segment_id_at_its_pixel(client: TestClient) 
     response: Response = client.get(url="/areas/test/segment_ids.png")
 
     assert response.headers["content-type"] == "image/png"
-    rgb: np.ndarray = np.asarray(Image.open(fp=BytesIO(response.content)))
+    rgb: np.ndarray = np.asarray(
+        a=Image.open(fp=BytesIO(initial_bytes=response.content))
+    )
     # IDs below 256 have only a low byte, so R and G are 0 and B is the ID
     assert rgb[..., 2].tolist() == [[0, 1, 2]]
     assert not rgb[..., :2].any()

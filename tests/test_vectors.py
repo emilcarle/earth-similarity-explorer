@@ -8,7 +8,7 @@ import pytest
 import rasterio
 from rasterio.transform import from_origin
 
-from earth_similarity_explorer.settings import EMBEDDING_BANDS
+from earth_similarity_explorer.settings import EMBEDDING_BANDS, PIXEL_COUNT_BAND
 from earth_similarity_explorer.vectors import build_vector_table, read_grid_segmentation
 
 
@@ -96,9 +96,9 @@ def test_grid_reader_returns_cells_with_pixels_and_their_centres(
         crs="EPSG:32632",
         transform=from_origin(west=670500, north=5283200, xsize=100, ysize=100),
     ) as dataset:
-        # pixel_count comes first so the reader must find bands by name and not by position
-        dataset.write(np.concatenate((pixel_count[np.newaxis], means)))
-        dataset.descriptions = ("pixel_count", *EMBEDDING_BANDS)
+        # The pixel count comes first so the reader must find bands by name and not by position
+        dataset.write(arr=np.concatenate((pixel_count[np.newaxis], means)))
+        dataset.descriptions = (PIXEL_COUNT_BAND, *EMBEDDING_BANDS)
 
     read_means, pixel_counts, x, y = read_grid_segmentation(path=path)
 

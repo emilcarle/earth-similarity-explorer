@@ -1,4 +1,4 @@
-"""Data backend delivery for the application, including segment IDs."""
+"""Files the web page needs besides the scores, such as the segment ID raster."""
 
 from io import BytesIO
 
@@ -11,9 +11,10 @@ from earth_similarity_explorer.settings import NO_SEGMENT_ID
 def build_id_raster(
     x: np.ndarray, y: np.ndarray, pixel_size_m: float
 ) -> tuple[np.ndarray, tuple[float, float]]:
-    """
-    Return a raster holding each segment's ID and its top-left corner in UTM metres.
-    x and y are the segment centres in segment_id order. Pixels without a segment hold NO_SEGMENT_ID.
+    """Return a raster holding each segment's ID and its top-left corner in UTM metres.
+
+    x and y are the segment centres in segment_id order. Pixels without a segment hold
+    NO_SEGMENT_ID.
     """
     # A larger ID would collide with NO_SEGMENT_ID or not fit into 24 bits
     if len(x) >= NO_SEGMENT_ID:

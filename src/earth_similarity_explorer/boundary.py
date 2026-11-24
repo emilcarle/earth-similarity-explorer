@@ -1,4 +1,4 @@
-"""Loading and checking the boundary geometries and deciding on the projected UTM."""
+"""Loading and checking boundary geometries, and choosing their UTM zone."""
 
 from pathlib import Path
 
@@ -22,8 +22,12 @@ def load_boundary(path: Path) -> Polygon | MultiPolygon:
     # Coordinates beyond ±180°/±90° are not degrees, e.g. UTM metres
     if not shapely.box(xmin=-180, ymin=-90, xmax=180, ymax=90).covers(geometry):
         raise ValueError(f"{path}: coordinates are not longitude/latitude")
+    # An invalid geometry, e.g. a ring that crosses itself, fails with shapely's reason
     if not geometry.is_valid:
-        raise ValueError(f"{path}: not valid, {shapely.is_valid_reason(geometry)}")
+        raise ValueError(
+            f"{path}: not valid, {shapely.is_valid_reason(geometry=geometry)}"
+        )
+    # Only areas can be study areas, not points or lines
     if isinstance(geometry, Polygon | MultiPolygon):
         return geometry
     raise ValueError(f"{path}: expected a Polygon or MultiPolygon")

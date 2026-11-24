@@ -1,5 +1,5 @@
-"""
-Search API that scores every segment of an area against a clicked segment.
+"""Search API that scores every segment of an area against a clicked segment.
+
 Run from the project root with uv run uvicorn earth_similarity_explorer.api:app
 """
 
@@ -21,7 +21,7 @@ from earth_similarity_explorer.search import (
     score_similarity,
 )
 from earth_similarity_explorer.serving import build_id_raster, encode_id_png
-from earth_similarity_explorer.settings import VECTORS_DIR
+from earth_similarity_explorer.settings import GRID_FILE_SUFFIX, VECTORS_DIR
 
 
 # RESPONSE MODELS
@@ -80,10 +80,13 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None]:
     # Each grid cell is one pixel of the ID raster
     cell_size_m: int = load_params().grid.cell_size_m
     # One entry per area, keyed by the area id in the file name
-    app.state.areas = {
-        path.stem.removesuffix("_grid"): load_area(path=path, pixel_size_m=cell_size_m)
-        for path in sorted(VECTORS_DIR.glob(pattern="*_grid.parquet"))
+    areas: dict[str, LoadedArea] = {
+        path.stem.removesuffix(GRID_FILE_SUFFIX): load_area(
+            path=path, pixel_size_m=cell_size_m
+        )
+        for path in sorted(VECTORS_DIR.glob(pattern=f"*{GRID_FILE_SUFFIX}.parquet"))
     }
+    app.state.areas = areas
     # The API answers requests while the lifespan waits
     yield
 

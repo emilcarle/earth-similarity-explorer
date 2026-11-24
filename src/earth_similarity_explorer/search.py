@@ -1,4 +1,4 @@
-"""Similarity search for vector tables based on input vectors."""
+"""Exact similarity search over an area's vectors table."""
 
 from pathlib import Path
 
@@ -22,7 +22,8 @@ def load_vectors(path: Path) -> np.ndarray:
 
 def score_similarity(vectors: np.ndarray, query_id: int) -> np.ndarray:
     """Return the similarity of every segment to the query segment, in segment_id order.
-    Vectors holds int8 vectors (N × 64), where the row number is the segment_id.
+
+    vectors holds int8 vectors (N × 64), where the row number is the segment_id.
     The scores are cosine similarities, between (approx.) −1 and 1.
     """
     # Convert to float32 since int8 products overflow (57 × 57 > 127)

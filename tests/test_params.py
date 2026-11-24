@@ -1,3 +1,5 @@
+"""Tests for the pipeline parameters."""
+
 from pathlib import Path
 
 import pytest

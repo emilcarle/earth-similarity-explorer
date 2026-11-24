@@ -1,4 +1,4 @@
-"""Google Earth Engine and Google Drive overhead, including downloading and exporting."""
+"""Earth Engine exports and their download from Google Drive."""
 
 import time
 from pathlib import Path
@@ -18,8 +18,8 @@ def initialize_earth_engine() -> None:
 
 
 def wait_for_task(task: Any, label: str) -> dict[str, Any]:
-    """
-    Wait for a started Earth Engine task, print its progress, return its metadata.
+    """Wait for a started Earth Engine task, print its progress and return its metadata.
+
     A line is printed when the state, the current stage or the whole percentage
     changes, and at least every 30 seconds while the task runs.
 
@@ -36,7 +36,7 @@ def wait_for_task(task: Any, label: str) -> dict[str, Any]:
         # The full operation record has progress, stages and compute use
         operation: dict[str, Any] = ee.data.getOperation(operation_name=task.name)
         metadata: dict[str, Any] = operation["metadata"]
-        # Go through each stage as it completes
+        # The current stage is the first one with work left
         stage: str = next(
             (
                 stage["displayName"]
@@ -99,9 +99,10 @@ def export_to_drive(
     metadata: dict[str, Any] = wait_for_task(task=task, label=file_prefix)
 
     # The finished task links the Drive folder it wrote to as .../#folders/<id>
-    return metadata["destinationUris"][0].rsplit("/", 1)[-1]
+    return metadata["destinationUris"][0].rsplit(sep="/", maxsplit=1)[-1]
 
 
+# GOOGLE DRIVE
 def download_from_drive(
     folder_id: str, file_prefix: str, destination_dir: Path
 ) -> list[Path]:
@@ -155,6 +156,7 @@ def download_from_drive(
     return paths
 
 
+# EXPORT AND DOWNLOAD
 def export_and_download(
     image: ee.Image,
     region: ee.Geometry,
