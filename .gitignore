@@ -18,5 +18,8 @@ dist/
 # Claude system prompts
 CLAUDE.md
 
-# Throwaway frontend spike (M0)
+# Throwaway prototypes and notebooks
 spike/
+
+# Packages of the web page, installed by npm from web/package-lock.json
+web/node_modules/

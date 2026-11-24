@@ -1,0 +1,29 @@
+/* The area floats in dark space */
+html,
+body {
+  height: 100%;
+  margin: 0;
+  background: #05070a;
+}
+
+/* A small panel over the scene with the status line and the threshold slider */
+#panel {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  z-index: 1;
+  display: grid;
+  gap: 6px;
+  width: 260px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: rgb(5 7 10 / 75%);
+  color: #c8d0d4;
+  font-family: system-ui, sans-serif;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+#status {
+  margin: 0;
+}

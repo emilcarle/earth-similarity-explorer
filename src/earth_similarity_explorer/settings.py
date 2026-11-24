@@ -36,6 +36,8 @@ DRIVE_EXPORT_FOLDER: str = "earth-similarity-explorer"
 DRIVE_FILES_URL: str = "https://www.googleapis.com/drive/v3/files"
 # The API sends each score as one byte, with −1 as 0 and 1 as this value
 SCORE_BYTE_MAX: int = 255
+# Segment IDs are packed into 24 bits (R, G, B), and the largest value marks "no segment"
+NO_SEGMENT_ID: int = 2**24 - 1
 
 # Frontend Specifications
 # Max length for the area name (rendered in the application)
