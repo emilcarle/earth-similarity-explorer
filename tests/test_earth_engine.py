@@ -1,3 +1,5 @@
+"""Live checks against Earth Engine, skipped without credentials."""
+
 from pathlib import Path
 from typing import Any
 
@@ -10,7 +12,11 @@ from shapely.geometry import mapping
 from earth_similarity_explorer.boundary import define_utm_epsg, load_boundary
 from earth_similarity_explorer.config import AreaConfig, load_area_config
 from earth_similarity_explorer.earth_engine import initialize_earth_engine
-from earth_similarity_explorer.settings import EMBEDDING_COLLECTION_ID, Settings
+from earth_similarity_explorer.settings import (
+    EMBEDDING_BANDS,
+    EMBEDDING_COLLECTION_ID,
+    Settings,
+)
 
 REPOSITORY_ROOT: Path = Path(__file__).parents[1]
 
@@ -40,7 +46,7 @@ def test_embeddings_cover_fixture_area_in_its_utm_zone() -> None:
     )
     first_image: ee.Image = images.first()
     # One request to Earth Engine for all three facts
-    facts: Any | None = ee.Dictionary(
+    facts: Any = ee.Dictionary(
         arg={
             "image_count": images.size(),
             "bands": first_image.bandNames(),
@@ -48,7 +54,6 @@ def test_embeddings_cover_fixture_area_in_its_utm_zone() -> None:
         }
     ).getInfo()
 
-    assert facts is not None
     assert facts["image_count"] >= 1
-    assert facts["bands"] == [f"A{band:02d}" for band in range(64)]
+    assert facts["bands"] == EMBEDDING_BANDS
     assert facts["crs"] == define_utm_epsg(boundary=boundary)

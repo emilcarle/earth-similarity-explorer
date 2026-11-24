@@ -5,38 +5,39 @@ stages:
     deps:
     - path: areas/schlehdorf.yaml
       hash: md5
-      md5: 44fb7ba7a0456cecd8928bcfd1e57c21
-      size: 164
+      md5: 3cdc41000821d9d5dad6eb480871d784
+      size: 142
     - path: data/geometries/schlehdorf.geojson
       hash: md5
       md5: bd1ca954d1393efb0d0933991491aa76
       size: 22594
     - path: src/earth_similarity_explorer/boundary.py
       hash: md5
-      md5: 849a277c4b9fa75cbf414d8c43ca1f90
-      size: 1651
+      md5: 4f43f8adc8afa85447396cd80de0d5c5
+      size: 1818
     - path: src/earth_similarity_explorer/config.py
       hash: md5
-      md5: 813c6eb22b32be72eb11058128ee9e69
-      size: 1832
+      md5: 35f46b6f04711ad62dcc6ba30dd47aa2
+      size: 1840
     - path: src/earth_similarity_explorer/earth_engine.py
       hash: md5
-      md5: e06219dd26e7979333e3738e2410b98e
-      size: 6399
+      md5: e8b22325a53310d3224587cdb08c6e6f
+      size: 6435
     - path: src/earth_similarity_explorer/grid.py
       hash: md5
-      md5: 49dbe69848fe0e166c64abe2f974805c
-      size: 3955
+      md5: a1497f82f4173b909f15b834a45c0124
+      size: 4432
     - path: src/earth_similarity_explorer/params.py
       hash: md5
-      md5: 7467c7b25f5b11da9ae8c1b5e3c222d7
-      size: 1068
+      md5: 7259020dcccfa64a457c850be94d7200
+      size: 1073
     params:
       params.yaml:
         grid.cell_size_m: 100
       src/earth_similarity_explorer/settings.py:
         EMBEDDING_COLLECTION_ID: GOOGLE/SATELLITE_EMBEDDING/V1/ANNUAL
         EMBEDDING_PIXEL_SIZE_M: 10
+        PIXEL_COUNT_BAND: pixel_count
     outs:
     - path: data/grid_segmentation/schlehdorf_grid.tif
       hash: md5
@@ -51,8 +52,8 @@ stages:
       size: 927183
     - path: src/earth_similarity_explorer/vectors.py
       hash: md5
-      md5: 4671cf941367c4f450a5712cb38f76c0
-      size: 4481
+      md5: 6a4772d52b88fdacd1c919efd1a17d68
+      size: 4496
     params:
       src/earth_similarity_explorer/settings.py:
         EMBEDDING_INT8_SCALE: 127

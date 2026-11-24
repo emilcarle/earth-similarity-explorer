@@ -1,3 +1,5 @@
+"""Tests for loading boundaries and choosing their UTM zone."""
+
 import json
 from pathlib import Path
 
@@ -42,7 +44,7 @@ def test_valid_boundary_loads(tmp_path: Path, geometry: BaseGeometry) -> None:
         path=write_geojson(directory=tmp_path, geometries=[geometry])
     )
 
-    assert boundary.equals(geometry)
+    assert boundary.equals(other=geometry)
 
 
 @pytest.mark.parametrize(
@@ -74,11 +76,11 @@ def test_invalid_boundary_fails(
 @pytest.mark.parametrize(
     argnames=("boundary", "epsg"),
     argvalues=[
-        # entirely in zone 32 (6° E to 12° E)
+        # Entirely in zone 32 (6° E to 12° E)
         (box(xmin=11.27, ymin=52, xmax=11.35, ymax=53), "EPSG:32632"),
-        # crosses 12° E, centroid at 12.5° E
+        # Crosses 12° E, centroid at 12.5° E
         (box(xmin=11.0, ymin=52, xmax=14.0, ymax=53), "EPSG:32633"),
-        # crosses 12° E, centroid at 11.25° E
+        # Crosses 12° E, centroid at 11.25° E
         (box(xmin=10.0, ymin=52, xmax=12.5, ymax=53), "EPSG:32632"),
         # Sydney, southern hemisphere
         (box(xmin=151.0, ymin=-34, xmax=151.3, ymax=-33.7), "EPSG:32756"),

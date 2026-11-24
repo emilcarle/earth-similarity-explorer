@@ -21,8 +21,8 @@ class AreaConfig(BaseModel):
 
     model_config = ConfigDict(extra="forbid", frozen=True, str_strip_whitespace=True)
 
-    # Id should be lowercase characters joined by single hyphens.
-    # The id becomes folder and storage paths.
+    # Lowercase letters and digits joined by single hyphens, since the id becomes
+    # part of folder and storage paths
     id: str = Field(pattern=r"^[a-z0-9]+(-[a-z0-9]+)*$")
     name: str = Field(min_length=1, max_length=AREA_NAME_MAX_LENGTH)
     year: int = Field(strict=True, ge=FIRST_EMBEDDING_YEAR, le=LAST_EMBEDDING_YEAR)

@@ -12,11 +12,15 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 # As plain constants instead of Settings fields they are readable without .env
 # (e.g. in CI) and no environment variable can override them.
 
-# Project folders, relative to the project root, where DVC runs every stage
+# Project files and folders, relative to the project root, where DVC runs every stage
+PARAMS_PATH: Path = Path("params.yaml")
 AREAS_DIR: Path = Path("areas")
 DATA_DIR: Path = Path("data")
 GRID_SEGMENTATION_DIR: Path = DATA_DIR / "grid_segmentation"
 VECTORS_DIR: Path = DATA_DIR / "vectors"
+# Output files of the grid segmentation end in this suffix, e.g. schlehdorf_grid.tif.
+# The output paths in dvc.yaml repeat it
+GRID_FILE_SUFFIX: str = "_grid"
 
 # The AlphaEarth annual embeddings in Earth Engine, and the years they cover.
 # Raise LAST_EMBEDDING_YEAR by hand when Google publishes a new year on this page
@@ -24,10 +28,13 @@ VECTORS_DIR: Path = DATA_DIR / "vectors"
 EMBEDDING_COLLECTION_ID: str = "GOOGLE/SATELLITE_EMBEDDING/V1/ANNUAL"
 FIRST_EMBEDDING_YEAR: int = 2017
 LAST_EMBEDDING_YEAR: int = 2024
-# Pixel size of the alphaearth embeddings in m
+# Pixel size of the AlphaEarth embeddings in metres
 EMBEDDING_PIXEL_SIZE_M: int = 10
-# Names of the 64 embedding bands, A00 to A63 and the vector columns of tables
+# Names of the 64 embedding bands (A00 to A63), which are also the vector columns
+# of the tables
 EMBEDDING_BANDS: list[str] = [f"A{band:02d}" for band in range(64)]
+# Name of the band that holds each segment's pixel count in a segmentation GeoTIFF
+PIXEL_COUNT_BAND: str = "pixel_count"
 # Embedding values can be stored as int8 with a minor loss in precision as round(value × scale)
 EMBEDDING_INT8_SCALE: int = 127
 # Google Drive folder that Earth Engine exports to
@@ -39,8 +46,8 @@ SCORE_BYTE_MAX: int = 255
 # Segment IDs are packed into 24 bits (R, G, B), and the largest value marks "no segment"
 NO_SEGMENT_ID: int = 2**24 - 1
 
-# Frontend Specifications
-# Max length for the area name (rendered in the application)
+# FRONTEND
+# Longest area name the web page shows
 AREA_NAME_MAX_LENGTH: int = 100
 
 

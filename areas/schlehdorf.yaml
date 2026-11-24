@@ -1,4 +1,4 @@
-# Fixture area for tests, CI and the walking skeleton. OSM relation 935260.
+# Fixture area for tests and CI. OSM relation 935260.
 id: schlehdorf
 name: Schlehdorf
 year: 2024

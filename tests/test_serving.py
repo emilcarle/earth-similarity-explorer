@@ -30,8 +30,8 @@ def test_id_png_keeps_every_id_exact_as_big_endian_rgb() -> None:
         object=[[0, 70_000], [NO_SEGMENT_ID - 1, NO_SEGMENT_ID]], dtype=np.uint32
     )
 
-    image: Image.Image = Image.open(fp=BytesIO(encode_id_png(ids=ids)))
-    rgb: np.ndarray = np.asarray(image).astype(dtype=np.uint32)
+    image: Image.Image = Image.open(fp=BytesIO(initial_bytes=encode_id_png(ids=ids)))
+    rgb: np.ndarray = np.asarray(a=image).astype(dtype=np.uint32)
 
     # RGB without an alpha channel
     assert image.mode == "RGB"

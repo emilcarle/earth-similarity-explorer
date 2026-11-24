@@ -7,6 +7,7 @@ import {
   HIGHLIGHT_COLOR,
   NO_SEGMENT_ID,
   QUERY_COLOR,
+  SCORE_BYTE_MAX,
   SCORE_TEXTURE_WIDTH,
 } from "./settings";
 
@@ -17,7 +18,8 @@ import {
 export type SegmentExtensionProps = {
   // One score byte per segment, from createScoreTexture
   scoreTexture: Texture | null;
-  // Score byte at or above which a segment is highlighted (256 highlights nothing)
+  // Score byte at or above which a segment is highlighted (SCORE_BYTE_MAX + 1
+  // highlights nothing)
   threshold: number;
   // The clicked segment, or −1 before the first click
   queryId: number;
@@ -111,7 +113,11 @@ function toVec4([red, green, blue]: [number, number, number]): Vec4 {
 /** Colours a BitmapLayer of segment IDs by the scores of the latest search, on the GPU. */
 export class SegmentExtension extends LayerExtension {
   static extensionName = "SegmentExtension";
-  static defaultProps = { scoreTexture: null, threshold: 256, queryId: -1 };
+  static defaultProps = {
+    scoreTexture: null,
+    threshold: SCORE_BYTE_MAX + 1,
+    queryId: -1,
+  };
 
   /** Add the segment module to the layer's shaders. */
   getShaders() {

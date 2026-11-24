@@ -18,11 +18,12 @@ stages:
         - data/geometries/${item}.geojson
       params:
         - grid.cell_size_m
-        # Reading only constants from settings.py instead of the whole file.
-        # This avoid re-running the task due to irrelevant changes to settings.py.
+        # Single constants of settings.py instead of the whole file, so that changes
+        # to other constants don't rerun the stage
         - src/earth_similarity_explorer/settings.py:
             - EMBEDDING_COLLECTION_ID
             - EMBEDDING_PIXEL_SIZE_M
+            - PIXEL_COUNT_BAND
       outs:
         - data/grid_segmentation/${item}_grid.tif
 

@@ -6,7 +6,7 @@ from typing import Any
 import yaml
 from pydantic import BaseModel, ConfigDict, Field
 
-from earth_similarity_explorer.settings import EMBEDDING_PIXEL_SIZE_M
+from earth_similarity_explorer.settings import EMBEDDING_PIXEL_SIZE_M, PARAMS_PATH
 
 
 class GridParams(BaseModel):
@@ -27,7 +27,7 @@ class Params(BaseModel):
     grid: GridParams
 
 
-def load_params(params_yaml_path: Path = Path("params.yaml")) -> Params:
+def load_params(params_yaml_path: Path = PARAMS_PATH) -> Params:
     """Read and validate params.yaml (by default the one in the project root)."""
     data: Any = yaml.safe_load(stream=params_yaml_path.read_text(encoding="utf-8"))
     return Params.model_validate(obj=data)

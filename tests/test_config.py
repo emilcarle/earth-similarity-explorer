@@ -1,3 +1,5 @@
+"""Tests for the area config."""
+
 from pathlib import Path
 
 import pytest
@@ -23,8 +25,9 @@ def write_config(directory: Path, **changes: object) -> Path:
     return path
 
 
+# TESTS
 def test_valid_config_loads(tmp_path: Path) -> None:
-    """The config loads correctly."""
+    """A valid config loads with its values."""
     config: AreaConfig = load_area_config(
         config_yaml_path=write_config(directory=tmp_path)
     )
@@ -55,7 +58,7 @@ def test_invalid_config_fails(tmp_path: Path, field: str, value: object) -> None
 
 
 def test_file_name_must_match_id(tmp_path: Path) -> None:
-    """File name must match the id"""
+    """A config whose file name differs from its id fails to load."""
     path: Path = write_config(directory=tmp_path).rename(
         target=tmp_path / "other-area.yaml"
     )
