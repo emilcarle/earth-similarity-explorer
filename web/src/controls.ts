@@ -14,6 +14,18 @@ export function showStatus(text: string): void {
   getElement("status").textContent = text;
 }
 
+/** Set up the map/cloud button and report each press. */
+export function initCloudToggle(onPress: () => void): void {
+  getElement("cloud-toggle").addEventListener("click", onPress);
+}
+
+/** Label the button with where it leads, and disable it while a cloud loads. */
+export function setCloudToggle(inCloud: boolean, loading: boolean): void {
+  const button = getElement<HTMLButtonElement>("cloud-toggle");
+  button.textContent = inCloud ? "Back to map" : "Show cloud";
+  button.disabled = loading;
+}
+
 /** Describe a threshold byte as the similarity it stands for. */
 function describeThreshold(byte: number): string {
   // A byte above 255 is beyond every score, so nothing is highlighted
