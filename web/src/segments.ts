@@ -8,7 +8,7 @@ import {
   NO_SEGMENT_ID,
   QUERY_COLOR,
   SCORE_BYTE_MAX,
-  SCORE_TEXTURE_WIDTH,
+  SEGMENT_TEXTURE_WIDTH,
 } from "./settings";
 
 // A layer extension adds GPU code to an existing deck.gl layer. This one makes a BitmapLayer
@@ -149,15 +149,15 @@ export function createScoreTexture(
   device: Device,
   scores: Uint8Array,
 ): Texture {
-  // Rows of SCORE_TEXTURE_WIDTH segments, as many as needed, with the last row padded
-  const height = Math.ceil(scores.length / SCORE_TEXTURE_WIDTH);
-  const data = new Uint8Array(SCORE_TEXTURE_WIDTH * height);
+  // Rows of SEGMENT_TEXTURE_WIDTH segments, as many as needed, with the last row padded
+  const height = Math.ceil(scores.length / SEGMENT_TEXTURE_WIDTH);
+  const data = new Uint8Array(SEGMENT_TEXTURE_WIDTH * height);
   data.set(scores);
 
   // One byte per texel (r8unorm), no mipmaps, so each texel stays one segment's score
   const texture = device.createTexture({
     format: "r8unorm",
-    width: SCORE_TEXTURE_WIDTH,
+    width: SEGMENT_TEXTURE_WIDTH,
     height,
     mipLevels: 1,
     sampler: { minFilter: "nearest", magFilter: "nearest" },

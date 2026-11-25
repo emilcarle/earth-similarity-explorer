@@ -87,12 +87,21 @@ def test_segment_ids_png_holds_each_segment_id_at_its_pixel(client: TestClient) 
     assert not rgb[..., :2].any()
 
 
+def test_pixel_counts_returns_four_bytes_per_segment(client: TestClient) -> None:
+    """Pixel counts arrive as uint32 in segment_id order."""
+    response: Response = client.get(url="/areas/test/pixel_counts")
+
+    assert response.content == np.array(object=[100, 100, 100], dtype="<u4").tobytes()
+
+
 @pytest.mark.parametrize(
     argnames="url",
     argvalues=[
         "/areas/nowhere",
         "/areas/nowhere/segment_ids.png",
+        "/areas/nowhere/pixel_counts",
         "/areas/nowhere/similar?segment=0",
+        "/areas/nowhere/cloud?west=0&south=0&east=1&north=1",
     ],
 )
 def test_unknown_area_returns_404_on_every_area_endpoint(
@@ -122,3 +131,31 @@ def test_similar_rejects_segments_outside_the_area(
     )
 
     assert response.status_code == status_code
+
+
+def test_cloud_returns_sorted_ids_then_positions_of_the_segments_in_the_bbox(
+    client: TestClient, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """A cloud holds 4 bytes per segment ID, then 3 position bytes per segment."""
+    # The test area has only three segments, so allow a cloud of two
+    monkeypatch.setattr(target=api, name="CLOUD_MIN_SEGMENTS", value=2)
+
+    # The bbox holds the centres of segments 1 and 2 (x 150 and 250) but not of 0
+    response: Response = client.get(
+        url="/areas/test/cloud",
+        params={"west": 100, "south": 0, "east": 300, "north": 100},
+    )
+
+    assert response.content[:8] == np.array(object=[1, 2], dtype="<u4").tobytes()
+    assert len(response.content) == 2 * 4 + 2 * 3
+    assert len(response.headers["x-explained-variance"].split(sep=",")) == 3
+
+
+def test_cloud_refuses_a_selection_too_small_for_a_pca(client: TestClient) -> None:
+    """A bbox with fewer segments than the minimum gets an error instead of a cloud."""
+    response: Response = client.get(
+        url="/areas/test/cloud",
+        params={"west": 0, "south": 0, "east": 300, "north": 100},
+    )
+
+    assert response.status_code == 422

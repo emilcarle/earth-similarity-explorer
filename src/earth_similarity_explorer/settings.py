@@ -43,6 +43,20 @@ DRIVE_EXPORT_FOLDER: str = "earth-similarity-explorer"
 DRIVE_FILES_URL: str = "https://www.googleapis.com/drive/v3/files"
 # The API sends each score as one byte, with −1 as 0 and 1 as this value
 SCORE_BYTE_MAX: int = 255
+# The API sends each 3D cloud position as one byte per axis. The centre of the cloud
+# becomes 128 and the clipping range becomes 128 ± 127.
+POSITION_BYTE_CENTRE: int = 128
+POSITION_BYTE_HALF_RANGE: int = 127
+# Positions beyond this percentile of all absolute coordinates are clipped, so a few
+# outliers don't squeeze the rest of the cloud together
+POSITION_CLIP_PERCENTILE: float = 99.9
+# The PCA of a cloud is fitted to at most this many randomly drawn segments of the
+# selection. The fixed seed draws the same ones for the same selection.
+CLOUD_FIT_SAMPLE_SIZE: int = 50_000
+CLOUD_FIT_SEED: int = 0
+# Below this many segments a PCA is degenerate or unstable (a 100 m pan turns its axes),
+# so the API refuses to build a cloud
+CLOUD_MIN_SEGMENTS: int = 100
 # Segment IDs are packed into 24 bits (R, G, B), and the largest value marks "no segment"
 NO_SEGMENT_ID: int = 2**24 - 1
 
