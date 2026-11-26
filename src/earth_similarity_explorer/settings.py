@@ -1,7 +1,7 @@
 """Project settings with fixed values and values read from the environment or .env.
 
-Tuned parameters (e.g. segmentation) do not belong here but in params.yaml, so that
-DVC can track them.
+Tuned parameters (e.g. the export tile size or the grid cell size) do not belong here
+but in params.yaml, so that DVC can track them.
 """
 
 from pathlib import Path
@@ -18,6 +18,7 @@ AREAS_DIR: Path = Path("areas")
 DATA_DIR: Path = Path("data")
 GRID_SEGMENTATION_DIR: Path = DATA_DIR / "grid_segmentation"
 VECTORS_DIR: Path = DATA_DIR / "vectors"
+EMBEDDINGS_DIR: Path = DATA_DIR / "embeddings"
 # Output files of the grid segmentation end in this suffix, e.g. schlehdorf_grid.tif.
 # The output paths in dvc.yaml repeat it
 GRID_FILE_SUFFIX: str = "_grid"
@@ -33,10 +34,23 @@ EMBEDDING_PIXEL_SIZE_M: int = 10
 # Names of the 64 embedding bands (A00 to A63), which are also the vector columns
 # of the tables
 EMBEDDING_BANDS: list[str] = [f"A{band:02d}" for band in range(64)]
-# Name of the band that holds each segment's pixel count in a segmentation GeoTIFF
+# Name of the band that holds each cell's pixel count in the grid GeoTIFF
 PIXEL_COUNT_BAND: str = "pixel_count"
-# Embedding values can be stored as int8 with a minor loss in precision as round(value × scale)
-EMBEDDING_INT8_SCALE: int = 127
+# The raw export stores AlphaEarth's own integers q without loss. AlphaEarth decodes
+# them as sign(q)·(q / 127.5)², with q between −127 and 127.
+EXPORT_INT8_SCALE: float = 127.5
+# Pixels outside the area get this value in the raw export, since int8 has no NaN
+EXPORT_INT8_NODATA: int = -128
+# Exported tiles are stored with ZSTD and a horizontal predictor, which keeps every value
+# and makes the files about 2.2 times smaller than Earth Engine's LZW at a similar read time
+EXPORT_GEOTIFF_OPTIONS: dict[str, str | int | bool] = {
+    "compress": "zstd",
+    "zstd_level": 9,
+    "predictor": 2,
+    "tiled": True,
+    "blockxsize": 512,
+    "blockysize": 512,
+}
 # Google Drive folder that Earth Engine exports to
 DRIVE_EXPORT_FOLDER: str = "earth-similarity-explorer"
 # The Drive REST API (v3) lists files at this URL and serves each file at URL/<id>

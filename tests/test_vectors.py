@@ -44,17 +44,17 @@ def test_table_has_the_shared_columns_and_types() -> None:
     assert table["segment_id"].dtype == np.int32
     assert table["pixel_count"].dtype == np.int32
     assert table["homogeneity"].dtype == np.float32
-    assert (table[EMBEDDING_BANDS].dtypes == np.int8).all()
+    assert (table[EMBEDDING_BANDS].dtypes == np.float32).all()
 
 
-def test_mean_becomes_homogeneity_and_int8_unit_vector() -> None:
-    """A mean of length 0.9 gives homogeneity 0.9 and the vector [0.6, 0.8] × 127."""
+def test_mean_becomes_homogeneity_and_unit_vector() -> None:
+    """A mean of length 0.9 gives homogeneity 0.9 and the unit vector [0.6, 0.8]."""
     table: pd.DataFrame = make_table(first_two=[(0.54, 0.72)], centres=[(50.0, 50.0)])
     row: pd.Series = table.iloc[0]
 
     assert row["homogeneity"] == np.float32(0.9)
-    # 0.6 × 127 = 76.2 and 0.8 × 127 = 101.6, rounded to the nearest integer
-    assert (row["A00"], row["A01"]) == (76, 102)
+    # [0.54, 0.72] divided by its length 0.9
+    assert (row["A00"], row["A01"]) == (np.float32(0.6), np.float32(0.8))
     assert (row[EMBEDDING_BANDS[2:]] == 0).all()
 
 

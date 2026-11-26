@@ -7,7 +7,6 @@ import numpy as np
 from earth_similarity_explorer.settings import (
     CLOUD_FIT_SAMPLE_SIZE,
     CLOUD_FIT_SEED,
-    EMBEDDING_INT8_SCALE,
     POSITION_BYTE_CENTRE,
     POSITION_BYTE_HALF_RANGE,
     POSITION_CLIP_PERCENTILE,
@@ -18,7 +17,7 @@ from earth_similarity_explorer.settings import (
 class PCA:
     """Three PCA axes for a set of segment vectors."""
 
-    # Weighted mean vector (centerpoint of the PCA)
+    # Weighted mean vector (the centre of the cloud)
     mean: np.ndarray
     # The axes as unit vectors, one per row (3 × 64)
     axes: np.ndarray
@@ -29,31 +28,31 @@ class PCA:
 def fit_pca(
     vectors: np.ndarray, weights: np.ndarray, reference_axes: np.ndarray | None = None
 ) -> PCA:
-    """Fit the three principal axes of int8 segment vectors, weighted by pixel count.
+    """Fit the three principal axes of segment vectors, weighted by pixel count.
 
     If reference_axes (3 × 64, the global axes) is supplied each axis is flipped
     to point the same way as the reference axis of the same rank.
     Without them each axis is flipped so that its largest component is positive.
     """
-    # Dequantization of the int8 to float64
-    matrix: np.ndarray = vectors.astype(dtype=np.float64) / EMBEDDING_INT8_SCALE
     # Calculate the weighted mean (by segment size) for each band (64)
-    # The mean vector represents the centerpoint of the PCA graph
-    mean: np.ndarray = np.average(a=matrix, axis=0, weights=weights)
-    # Calculate the weighed covariance (by segment size) for each segment/vector
-    covariance: np.ndarray = np.cov(m=matrix, rowvar=False, aweights=weights, bias=True)
-    # Calculate the eigenvectors and their variances.
+    # The mean vector is the centre of the cloud
+    mean: np.ndarray = np.average(a=vectors, axis=0, weights=weights)
+    # Calculate the weighted covariance (by segment size) between the bands (64 × 64)
+    covariance: np.ndarray = np.cov(
+        m=vectors, rowvar=False, aweights=weights, bias=True
+    )
+    # Calculate the eigenvectors and their variances
     variances, eigenvectors = np.linalg.eigh(a=covariance)
     # Keep the three eigenvectors with the highest variance
     axes: np.ndarray = eigenvectors[:, :-4:-1].T
     # Calculate the explained variance captured by the first three principal components
     explained_variance: np.ndarray = variances[:-4:-1] / variances.sum()
 
-    # If no reference, the largest value of each component becomes the positive direction
+    # Without reference axes, the largest value of each axis sets its positive direction
     if reference_axes is None:
         signed_by: np.ndarray = axes[np.arange(3), np.argmax(a=np.abs(axes), axis=1)]
-    # Otherwise if global reference is supplied, the follow the orientation of its axes
-    # so that the orientation of different PCAs stay stable
+    # With reference axes, follow their orientation, so the clouds of different
+    # selections don't appear mirrored
     else:
         signed_by = np.vecdot(axes, reference_axes)
     # Multiply each axis whose chosen value is negative by −1 to flip it
@@ -64,12 +63,10 @@ def fit_pca(
 
 
 def project_positions(pca: PCA, vectors: np.ndarray) -> np.ndarray:
-    """Place int8 segment vectors in the cloud as coordinates along the PCA axes (N × 3)."""
-    # Dequantization of the int8 to float64
-    matrix: np.ndarray = vectors.astype(dtype=np.float64) / EMBEDDING_INT8_SCALE
-    # Subtract the mean so the centerpoint of the PCA becomes the origin (0, 0, 0)
+    """Place segment vectors in the cloud as coordinates along the PCA axes (N × 3)."""
+    # Subtract the mean so the centre of the cloud becomes the origin (0, 0, 0)
     # and take the dot product with each axis (one column per axis)
-    return (matrix - pca.mean) @ pca.axes.T
+    return (vectors - pca.mean) @ pca.axes.T
 
 
 def quantize_positions(positions: np.ndarray) -> np.ndarray:

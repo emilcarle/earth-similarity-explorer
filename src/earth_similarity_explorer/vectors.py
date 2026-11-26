@@ -1,4 +1,4 @@
-"""The vectors table of an area, one row per segment of a segmentation GeoTIFF.
+"""The vectors table of an area, with one row per segment (a grid cell or a code).
 
 Run from the project root with uv run python -m earth_similarity_explorer.vectors <area id>
 """
@@ -13,7 +13,6 @@ import rasterio
 
 from earth_similarity_explorer.settings import (
     EMBEDDING_BANDS,
-    EMBEDDING_INT8_SCALE,
     GRID_FILE_SUFFIX,
     GRID_SEGMENTATION_DIR,
     PIXEL_COUNT_BAND,
@@ -34,11 +33,7 @@ def build_vector_table(
     # keepdims returns it as a column (N × 1), so each row is divided by its own length
     homogeneity: np.ndarray = np.linalg.norm(x=means, axis=1, keepdims=True)
     # Set the vector to unit length, so a dot product of two vectors is their cosine similarity
-    vectors: np.ndarray = means / homogeneity
-    # Store as int8, a quarter of the size of float32
-    stored: np.ndarray = np.round(a=vectors * EMBEDDING_INT8_SCALE).astype(
-        dtype=np.int8
-    )
+    vectors: np.ndarray = (means / homogeneity).astype(dtype=np.float32)
 
     table: pd.DataFrame = pd.DataFrame(
         data={
@@ -46,7 +41,7 @@ def build_vector_table(
             "y": y,
             "pixel_count": pixel_counts.astype(dtype=np.int32),
             "homogeneity": homogeneity[:, 0].astype(dtype=np.float32),
-            **{band: stored[:, i] for i, band in enumerate(iterable=EMBEDDING_BANDS)},
+            **{band: vectors[:, i] for i, band in enumerate(iterable=EMBEDDING_BANDS)},
         }
     )
     # North to south, then west to east. A stable sort keeps ties in order.
@@ -60,7 +55,7 @@ def build_vector_table(
     return table
 
 
-# READERS (one per segmentation kind) return the inputs for build_vector_table
+# READERS (one per kind of segment) return the inputs for build_vector_table
 def read_grid_segmentation(
     path: Path,
 ) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
@@ -78,7 +73,7 @@ def read_grid_segmentation(
 
     # Cells inside the area have a pixel count that is not NaN
     inside: np.ndarray = ~np.isnan(count_raster)
-    # Get values of the pixels inside the mask (aka. unmasked)
+    # Keep the pixel counts and means of the cells inside the area
     pixel_counts: np.ndarray = count_raster[inside]
     means: np.ndarray = means_raster[:, inside].T
     # Get the centroid of each cell, from its row and column, in UTM metres

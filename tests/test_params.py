@@ -8,7 +8,11 @@ from pydantic import ValidationError
 
 from earth_similarity_explorer.params import load_params
 
-VALID_PARAMS: dict[str, object] = {"areas": ["test-area"], "grid": {"cell_size_m": 100}}
+VALID_PARAMS: dict[str, object] = {
+    "areas": ["test-area"],
+    "export": {"tile_size_m": 20000},
+    "grid": {"cell_size_m": 100},
+}
 
 
 # TESTS
@@ -17,10 +21,20 @@ VALID_PARAMS: dict[str, object] = {"areas": ["test-area"], "grid": {"cell_size_m
     argvalues=[
         {"grid": {"cell_size_m": 105}},
         {"grid": {"cell_size_m": "100"}},
+        {"export": {"tile_size_m": 20005}},
+        # 20 km is not a multiple of 300 m, so a cell would cross a tile edge
+        {"grid": {"cell_size_m": 300}},
         {"areas": []},
         {"segmentation": {}},
     ],
-    ids=["cell-cuts-pixels", "cell-size-as-string", "no-areas", "unknown-section"],
+    ids=[
+        "cell-cuts-pixels",
+        "cell-size-as-string",
+        "tile-cuts-pixels",
+        "cell-crosses-tiles",
+        "no-areas",
+        "unknown-section",
+    ],
 )
 def test_invalid_params_fail(tmp_path: Path, changes: dict[str, object]) -> None:
     """Invalid parameters fail to load."""

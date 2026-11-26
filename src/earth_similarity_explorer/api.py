@@ -76,7 +76,7 @@ class LoadedArea:
 
 def load_area(path: Path, pixel_size_m: int) -> LoadedArea:
     """Read an area's vector table, fit its global PCA and build its ID raster as a PNG."""
-    # Load the int8 vectors for the search and the cloud
+    # Load the vectors for the search and the cloud
     vectors: np.ndarray = load_vectors(path=path)
     segments: pd.DataFrame = pd.read_parquet(
         path=path, columns=["x", "y", "pixel_count"]
@@ -168,8 +168,8 @@ def segment_ids(area: str) -> Response:
 def pixel_counts(area: str) -> Response:
     """Return each segment's pixel count (uint32, little-endian) in segment_id order.
 
-    The page draws one cloud point per pixel. With the 100 m ID raster it doesn't see
-    the pixels themselves, so it needs their number per segment.
+    The page draws one cloud point per pixel. Its ID raster has one pixel per grid cell,
+    so it doesn't see the 10 m pixels and needs their number per segment.
     """
     weights: np.ndarray = get_area(area=area).weights
     return Response(
