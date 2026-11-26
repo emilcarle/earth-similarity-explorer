@@ -5,6 +5,11 @@
 areas:
   - schlehdorf
 
+# The export of the embeddings from Earth Engine in square tiles on a grid anchored
+# at (0, 0). Whole grid cells of every size to try must fit into a tile
+export:
+  tile_size_m: 20000
+
 # The grid baseline of square cells with mean embeddings
 grid:
   cell_size_m: 100

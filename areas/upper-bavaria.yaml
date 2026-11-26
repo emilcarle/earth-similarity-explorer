@@ -1,0 +1,5 @@
+# The published area, the Regierungsbezirk Oberbayern. OSM relation 2145274.
+id: upper-bavaria
+name: Upper Bavaria
+year: 2024
+boundary: data/geometries/upper-bavaria.geojson

@@ -52,8 +52,8 @@ export function buildPoints(
   const segmentIds = new Float32Array(length);
   const jitter = new Float32Array(length * 3);
 
-  // Fill the points cell by cell, with z at 0 on the map. The 100 m raster doesn't
-  // show which of a cell's pixels lie in the area, so they are scattered over all of it.
+  // Fill the points cell by cell, with z at 0 on the map. The ID raster has one pixel per
+  // cell and doesn't show which of its pixels lie in the area, so they are scattered over all of it.
   let point = 0;
   ids.forEach((id, cell) => {
     const column = cell % width;

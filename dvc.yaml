@@ -3,26 +3,53 @@
 # in the `areas` list of params.yaml.
 
 stages:
-  grid:
+  export:
     foreach: ${areas}
     do:
-      desc: Create the grid segmentation of mean embeddings with Earth Engine
-      cmd: uv run python -m earth_similarity_explorer.grid ${item}
+      desc: Export the int8 embeddings of the area from Earth Engine, tile by tile
+      cmd: uv run python -m earth_similarity_explorer.earth_engine ${item}
       deps:
-        - src/earth_similarity_explorer/grid.py
+        - src/earth_similarity_explorer/earth_engine.py
         - src/earth_similarity_explorer/boundary.py
         - src/earth_similarity_explorer/config.py
-        - src/earth_similarity_explorer/earth_engine.py
         - src/earth_similarity_explorer/params.py
         - areas/${item}.yaml
         - data/geometries/${item}.geojson
+      params:
+        - export.tile_size_m
+        - src/earth_similarity_explorer/settings.py:
+            - EMBEDDING_COLLECTION_ID
+            - EMBEDDING_PIXEL_SIZE_M
+            - EXPORT_INT8_SCALE
+            - EXPORT_INT8_NODATA
+            - EXPORT_GEOTIFF_OPTIONS
+      outs:
+        # One folder per tile. DVC keeps the finished tiles when the stage reruns, and
+        # the stage skips them, so a failed run resumes and a rerun exports nothing.
+        # Delete the area's folder to export it again
+        - data/embeddings/${item}:
+            persist: true
+
+  grid:
+    foreach: ${areas}
+    do:
+      desc: Average the exported pixels into the grid segmentation of mean embeddings
+      cmd: uv run python -m earth_similarity_explorer.grid ${item}
+      deps:
+        - src/earth_similarity_explorer/grid.py
+        # For decode_int8
+        - src/earth_similarity_explorer/earth_engine.py
+        - src/earth_similarity_explorer/params.py
+        # The export stage's output, so DVC runs export first and grid after it
+        - data/embeddings/${item}
       params:
         - grid.cell_size_m
         # Single constants of settings.py instead of the whole file, so that changes
         # to other constants don't rerun the stage
         - src/earth_similarity_explorer/settings.py:
-            - EMBEDDING_COLLECTION_ID
             - EMBEDDING_PIXEL_SIZE_M
+            - EXPORT_INT8_SCALE
+            - EXPORT_INT8_NODATA
             - PIXEL_COUNT_BAND
       outs:
         - data/grid_segmentation/${item}_grid.tif
@@ -30,14 +57,11 @@ stages:
   vectors:
     foreach: ${areas}
     do:
-      desc: One table row per grid cell, with its renormalized int8 vector
+      desc: One table row per grid cell, with its renormalized vector
       cmd: uv run python -m earth_similarity_explorer.vectors ${item}
       deps:
         - src/earth_similarity_explorer/vectors.py
         # The grid stage's output, so DVC runs grid first and vectors after it
         - data/grid_segmentation/${item}_grid.tif
-      params:
-        - src/earth_similarity_explorer/settings.py:
-            - EMBEDDING_INT8_SCALE
       outs:
         - data/vectors/${item}_grid.parquet

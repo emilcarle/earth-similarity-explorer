@@ -2,13 +2,19 @@
 
 import json
 from pathlib import Path
+from typing import Any
 
 import pytest
+from rasterio.warp import transform_geom
 from shapely import MultiPolygon, Point, Polygon, box
-from shapely.geometry import mapping
+from shapely.geometry import mapping, shape
 from shapely.geometry.base import BaseGeometry
 
-from earth_similarity_explorer.boundary import define_utm_epsg, load_boundary
+from earth_similarity_explorer.boundary import (
+    define_tiles,
+    define_utm_epsg,
+    load_boundary,
+)
 
 # Non-square shapes near Schlehdorf (a circle and two circles as one MultiPolygon)
 CIRCLE: Polygon = Point(11.31, 47.65).buffer(distance=0.03)
@@ -92,3 +98,35 @@ def test_define_utm_epsg_contains_centroid(
 ) -> None:
     """The EPSG code is the UTM zone and hemisphere containing the area's centroid."""
     assert define_utm_epsg(boundary=boundary) == epsg
+
+
+def test_tiles_overlap_the_boundary_and_run_north_to_south() -> None:
+    """Tiles on a grid anchored at (0, 0) are listed if they overlap the boundary."""
+    # Two 2 × 2 km squares in UTM zone 32N, each on a corner of four 20 km tiles,
+    # given in longitude/latitude like a boundary file
+    squares: MultiPolygon = MultiPolygon(
+        polygons=[
+            box(xmin=659_000, ymin=5_279_000, xmax=661_000, ymax=5_281_000),
+            box(xmin=719_000, ymin=5_279_000, xmax=721_000, ymax=5_281_000),
+        ]
+    )
+    boundary: Any = shape(
+        transform_geom(src_crs="EPSG:32632", dst_crs="EPSG:4326", geom=mapping(squares))
+    )
+
+    tiles: list[tuple[int, int]] = define_tiles(
+        boundary=boundary, crs="EPSG:32632", tile_size_m=20_000
+    )
+
+    # The tiles with their west edge at 680 000 m lie between the squares, so the
+    # bounding box holds 10 tiles but only 8 are listed
+    assert tiles == [
+        (640_000, 5_300_000),
+        (660_000, 5_300_000),
+        (700_000, 5_300_000),
+        (720_000, 5_300_000),
+        (640_000, 5_280_000),
+        (660_000, 5_280_000),
+        (700_000, 5_280_000),
+        (720_000, 5_280_000),
+    ]

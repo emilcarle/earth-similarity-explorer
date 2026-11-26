@@ -2,7 +2,7 @@
 
 // The dev server forwards this path to the search API (see vite.config.ts)
 export const API_URL = "/api";
-// The only area so far
+// The area the page shows, the only one the API serves so far
 export const AREA_ID = "schlehdorf";
 // Segment IDs are packed into 24 bits (R, G, B), and the largest value marks "no segment"
 export const NO_SEGMENT_ID = 2 ** 24 - 1;

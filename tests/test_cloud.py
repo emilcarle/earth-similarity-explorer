@@ -17,23 +17,21 @@ def test_axes_follow_the_segments_with_the_most_pixels() -> None:
     """The first axis runs along the spread of the heavier segments and explains the most."""
     # Two segments of 100 pixels spread along A00, and two of 1 pixel spread twice as far
     # along A01. Unweighted, A01 would be the first axis.
-    vectors: np.ndarray = np.zeros(shape=(4, len(EMBEDDING_BANDS)), dtype=np.int8)
-    vectors[:, :2] = [[50, 0], [-50, 0], [0, 100], [0, -100]]
+    vectors: np.ndarray = np.zeros(shape=(4, len(EMBEDDING_BANDS)))
+    vectors[:, :2] = [[0.5, 0], [-0.5, 0], [0, 1], [0, -1]]
     weights: np.ndarray = np.array(object=[100, 100, 1, 1])
 
     pca: PCA = fit_pca(vectors=vectors, weights=weights)
 
     assert abs(pca.axes[0, 0]) == pytest.approx(expected=1)
-    # Weighted variances 200 × 50² along A00 and 2 × 100² along A01 give a share of 25/26
+    # Weighted variances 200 × 0.5² along A00 and 2 × 1² along A01 give a share of 25/26
     assert pca.explained_variance[0] == pytest.approx(expected=25 / 26)
 
 
 def test_global_axes_have_a_positive_largest_component() -> None:
     """Without reference axes, the largest component of each axis is positive."""
     rng: np.random.Generator = np.random.default_rng(seed=0)
-    vectors: np.ndarray = rng.integers(
-        low=-127, high=128, size=(50, len(EMBEDDING_BANDS)), dtype=np.int8
-    )
+    vectors: np.ndarray = rng.standard_normal(size=(50, len(EMBEDDING_BANDS)))
 
     pca: PCA = fit_pca(vectors=vectors, weights=np.ones(shape=50))
 
@@ -45,9 +43,7 @@ def test_global_axes_have_a_positive_largest_component() -> None:
 def test_axes_point_the_same_way_as_the_reference_axes() -> None:
     """Each axis is flipped if it points against the reference axis of the same rank."""
     rng: np.random.Generator = np.random.default_rng(seed=0)
-    vectors: np.ndarray = rng.integers(
-        low=-127, high=128, size=(50, len(EMBEDDING_BANDS)), dtype=np.int8
-    )
+    vectors: np.ndarray = rng.standard_normal(size=(50, len(EMBEDDING_BANDS)))
     weights: np.ndarray = np.ones(shape=50)
     unaligned: PCA = fit_pca(vectors=vectors, weights=weights)
     # References that point against the first and third axis and along the second
@@ -64,17 +60,17 @@ def test_positions_are_coordinates_along_the_axes_around_the_mean() -> None:
     """A segment's position is its offset from the mean, measured along each axis."""
     # The vectors of the first test, whose weighted mean is 0 and whose first two axes
     # are A00 and A01
-    vectors: np.ndarray = np.zeros(shape=(4, len(EMBEDDING_BANDS)), dtype=np.int8)
-    vectors[:, :2] = [[50, 0], [-50, 0], [0, 100], [0, -100]]
+    vectors: np.ndarray = np.zeros(shape=(4, len(EMBEDDING_BANDS)))
+    vectors[:, :2] = [[0.5, 0], [-0.5, 0], [0, 1], [0, -1]]
     pca: PCA = fit_pca(vectors=vectors, weights=np.array(object=[100, 100, 1, 1]))
 
     positions: np.ndarray = project_positions(pca=pca, vectors=vectors)
 
-    # The int8 values divided by 127, with PC3 at 0 since no segment varies along it
+    # The A00 and A01 values themselves, with PC3 at 0 since no segment varies along it
     expected: np.ndarray = np.array(
-        object=[[50, 0, 0], [-50, 0, 0], [0, 100, 0], [0, -100, 0]]
+        object=[[0.5, 0, 0], [-0.5, 0, 0], [0, 1, 0], [0, -1, 0]]
     )
-    assert np.allclose(positions, expected / 127)
+    assert np.allclose(positions, expected)
 
 
 def test_quantized_axes_share_one_scale_centred_at_128() -> None:
