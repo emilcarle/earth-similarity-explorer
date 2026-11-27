@@ -4,6 +4,7 @@
 # Areas that `dvc repro` builds. Each needs a config in areas/<id>.yaml
 areas:
   - schlehdorf
+  - upper-bavaria
 
 # The export of the embeddings from Earth Engine in square tiles on a grid anchored
 # at (0, 0). Whole grid cells of every size to try must fit into a tile

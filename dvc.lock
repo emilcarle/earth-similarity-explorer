@@ -97,3 +97,100 @@ stages:
       md5: 0c3130bbc0260797871e964cb8124fbd.dir
       size: 9189170
       nfiles: 2
+  export@upper-bavaria:
+    cmd: uv run python -m earth_similarity_explorer.earth_engine upper-bavaria
+    deps:
+    - path: areas/upper-bavaria.yaml
+      hash: md5
+      md5: b881c4b50d052d515d3318fa6e1c6216
+      size: 174
+    - path: data/geometries/upper-bavaria.geojson
+      hash: md5
+      md5: c7ff9bc6f2b653e0868b85fa0087ee27
+      size: 1154812
+    - path: src/earth_similarity_explorer/boundary.py
+      hash: md5
+      md5: 33f7ccaa65152d2ab2286d5ad10626c6
+      size: 3421
+    - path: src/earth_similarity_explorer/config.py
+      hash: md5
+      md5: 35f46b6f04711ad62dcc6ba30dd47aa2
+      size: 1840
+    - path: src/earth_similarity_explorer/earth_engine.py
+      hash: md5
+      md5: bb1239608d06de8bd8a89503a9b49b85
+      size: 12767
+    - path: src/earth_similarity_explorer/params.py
+      hash: md5
+      md5: 2e3b222ccd5b171c66a598d1d2197881
+      size: 1828
+    params:
+      params.yaml:
+        export.tile_size_m: 20000
+      src/earth_similarity_explorer/settings.py:
+        EMBEDDING_COLLECTION_ID: GOOGLE/SATELLITE_EMBEDDING/V1/ANNUAL
+        EMBEDDING_PIXEL_SIZE_M: 10
+        EXPORT_GEOTIFF_OPTIONS:
+          compress: zstd
+          zstd_level: 9
+          predictor: 2
+          tiled: true
+          blockxsize: 512
+          blockysize: 512
+        EXPORT_INT8_NODATA: -128
+        EXPORT_INT8_SCALE: 127.5
+    outs:
+    - path: data/embeddings/upper-bavaria
+      hash: md5
+      md5: 907380fe6e98de55e244eda94df9ca11.dir
+      size: 6231112908
+      nfiles: 66
+  grid@upper-bavaria:
+    cmd: uv run python -m earth_similarity_explorer.grid upper-bavaria
+    deps:
+    - path: data/embeddings/upper-bavaria
+      hash: md5
+      md5: 907380fe6e98de55e244eda94df9ca11.dir
+      size: 6231112908
+      nfiles: 66
+    - path: src/earth_similarity_explorer/earth_engine.py
+      hash: md5
+      md5: bb1239608d06de8bd8a89503a9b49b85
+      size: 12767
+    - path: src/earth_similarity_explorer/grid.py
+      hash: md5
+      md5: 87cea70c1a8466c2f092e0ba5824ecea
+      size: 6579
+    - path: src/earth_similarity_explorer/params.py
+      hash: md5
+      md5: 2e3b222ccd5b171c66a598d1d2197881
+      size: 1828
+    params:
+      params.yaml:
+        grid.cell_size_m: 100
+      src/earth_similarity_explorer/settings.py:
+        EMBEDDING_PIXEL_SIZE_M: 10
+        EXPORT_INT8_NODATA: -128
+        EXPORT_INT8_SCALE: 127.5
+        PIXEL_COUNT_BAND: pixel_count
+    outs:
+    - path: data/grid_segmentation/upper-bavaria_grid.tif
+      hash: md5
+      md5: f9642ba06fe5c2d3029981677b749cea
+      size: 1040038063
+  vectors@upper-bavaria:
+    cmd: uv run python -m earth_similarity_explorer.vectors upper-bavaria
+    deps:
+    - path: data/grid_segmentation/upper-bavaria_grid.tif
+      hash: md5
+      md5: f9642ba06fe5c2d3029981677b749cea
+      size: 1040038063
+    - path: src/earth_similarity_explorer/vectors.py
+      hash: md5
+      md5: c7743dc23f84ce7afcc09c7a3e935064
+      size: 4345
+    outs:
+    - path: data/vectors/upper-bavaria_grid.parquet
+      hash: md5
+      md5: b596676ed59218ca3d7477a16a2b22f0
+      size: 541766060
